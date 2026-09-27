@@ -102,6 +102,8 @@ npm run build
 
 ## Known gaps
 
+Deferred work with verification steps is tracked in `TODO.md`.
+
 * **Digital resale.** Listings accept a digital format, but reselling a commercial ebook is usually piracy under its licence. Restrict digital listings to public domain or self published works, or remove the option before launch.
 * **Commission leakage.** Members can agree a trade in DMs and pay cash in person. At this scale that is normal, so expect commission to be a small income line.
 * **Arabic.** The type stack covers Latin and French. Arabic posts will fall back to a system font until an Arabic face is added.
