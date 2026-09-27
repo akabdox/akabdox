@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Design tokens. Two values drive everything: ink #1c1c1c, paper #f2f2f2.
+   Dark mode swaps them. Status is carried by form (fill, outline, dash),
+   not hue, so the system stays monochrome. Red is reserved for errors.
+   --------------------------------------------------------------------------- */
+:root {
+  --paper: #f2f2f2;
+  --surface: #f9f9f9;
+  --sunken: #e8e8e8;
+  --ink: #1c1c1c;
+  --ink-2: #4a4a4a;
+  --ink-3: #6b6b6b;
+  --rule: #d9d9d9;
+  --rule-strong: #bdbdbd;
+  --danger: #b3261e;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #1c1c1c;
+    --surface: #242424;
+    --sunken: #161616;
+    --ink: #f2f2f2;
+    --ink-2: #c4c4c4;
+    --ink-3: #9a9a9a;
+    --rule: #333333;
+    --rule-strong: #474747;
+    --danger: #f2877f;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-sunken: var(--sunken);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-danger: var(--danger);
+
+  /* Adobe Fonts (futura-pt) or the system Futura when present, Jost otherwise. */
+  --font-sans: "futura-pt", Futura, var(--font-jost), "Century Gothic", ui-sans-serif, sans-serif;
+}
+
+@layer base {
+  html {
+    background: var(--paper);
+    color: var(--ink);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100dvh;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+}
+
+/* Small uppercase label, the system's main typographic signature. */
+@utility eyebrow {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* Long-form text: posts, reviews, bios. */
+@utility reading {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Motion: one entrance, staggered by --i. No animation library needed. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@utility animate-rise {
+  animation: rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(min(var(--i, 0), 12) * 35ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+/* Composer: rating and book fields only show for reviews. No JS. */
+.composer .review-only {
+  display: none;
+}
+
+.composer:has(input[name="kind"][value="review"]:checked) .review-only {
+  display: grid;
+}
