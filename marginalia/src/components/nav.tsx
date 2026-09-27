@@ -44,7 +44,7 @@ export function Nav({ viewer }: { viewer: Profile }) {
       </header>
 
       {/* Mobile: thumb-reach tab bar. */}
-      <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-rule bg-paper/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-rule bg-paper pb-[env(safe-area-inset-bottom)] md:hidden">
         <div className="grid h-14 grid-cols-4">
           {links.map((l) => (
             <NavLink key={l.label} href={l.href} match={l.match} className="grid place-items-center">
