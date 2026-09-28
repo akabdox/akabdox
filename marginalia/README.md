@@ -4,6 +4,8 @@ A private community for 1,000 readers. Members post thoughts and reviews, keep a
 
 Working name. Rename it in `src/lib/site.ts`.
 
+Live: https://taupe-sprite-d79dcc.netlify.app (Netlify builds this branch on every push).
+
 ## Stack
 
 | Layer | Choice | Why |
