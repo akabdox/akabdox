@@ -15,6 +15,7 @@ export async function signIn(_: ActionState, form: FormData): Promise<ActionStat
     email: field(form, 'email'),
     password: field(form, 'password'),
   })
+  if (error?.code === 'email_not_confirmed') return { error: 'Confirm your email first. Check your inbox for the link.' }
   if (error) return { error: 'That email and password do not match.' }
   redirect(safeNext(field(form, 'next')))
 }
