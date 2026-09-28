@@ -6,3 +6,7 @@
 
 [build.environment]
   NODE_VERSION = "22"
+
+# Server rendering, server actions and proxy.ts need the Next.js runtime.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
