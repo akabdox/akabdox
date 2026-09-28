@@ -47,38 +47,44 @@ select pg_temp.expect_error(
   $$ insert into auth.users (email, raw_user_meta_data) values ('x@example.com', '{"username": "nope"}') $$,
   'invite');
 
+-- one owner link seats three people, then closes
 select pg_temp.act_as(:'founder');
-select code as invite_a from public.create_invite() \gset
-select code as invite_b from public.create_invite() \gset
-select code as invite_c from public.create_invite() \gset
+select code as link from public.create_invite(3, 30) \gset
 reset role;
 
 do $$ begin
-  assert public.check_signup('BADCODE', 'someone', 'a@b.c') ilike '%invite%', 'bad code reported';
+  assert public.check_signup('BADCODE', 'someone', 'a@b.c') ilike '%expired or is full%', 'bad link reported';
+  assert public.check_signup('', 'someone', 'a@b.c') ilike '%invitation%', 'missing link reported';
   assert public.check_signup((select code from public.invites limit 1), 'founder', 'a@b.c') ilike '%taken%', 'taken username reported';
   assert public.check_signup((select code from public.invites limit 1), 'fresh_name', 'a@b.c') is null, 'valid signup passes';
 end $$;
 
 insert into auth.users (id, email, raw_user_meta_data) values
-  (:'seller', 's@example.com', json_build_object('invite_code', lower(:'invite_a'), 'username', 'seller')::jsonb),
-  (:'buyer',  'b@example.com', json_build_object('invite_code', :'invite_b', 'username', 'buyer')::jsonb),
-  (:'other',  'o@example.com', json_build_object('invite_code', :'invite_c', 'username', 'other')::jsonb);
+  (:'seller', 's@example.com', json_build_object('invite_code', lower(:'link'), 'username', 'seller')::jsonb),
+  (:'buyer',  'b@example.com', json_build_object('invite_code', :'link', 'username', 'buyer')::jsonb),
+  (:'other',  'o@example.com', json_build_object('invite_code', :'link', 'username', 'other')::jsonb);
 
 select pg_temp.expect_error(
-  format($$ insert into auth.users (email, raw_user_meta_data) values ('y@example.com', '{"invite_code": "%s", "username": "reuse"}') $$, :'invite_a'),
+  format($$ insert into auth.users (email, raw_user_meta_data) values ('y@example.com', '{"invite_code": "%s", "username": "fourth"}') $$, :'link'),
   'invite');
 
 do $$ begin
   assert (select count(*) from public.profiles) = 4, 'four members';
-  assert (select count(*) from public.invites where used_by is not null) = 3, 'three invites used';
+  assert (select uses from public.invites) = 3, 'link used three times';
+  assert public.check_signup((select code from public.invites limit 1), 'fresh_name', 'a@b.c') ilike '%full%', 'full link reported';
 end $$;
 
--- member invite quota (3 by default)
+-- only the owner creates or closes links
 select pg_temp.act_as(:'seller');
-select public.create_invite();
-select public.create_invite();
-select public.create_invite();
-select pg_temp.expect_error($$ select public.create_invite() $$, 'used all');
+select pg_temp.expect_error($$ select public.create_invite() $$, 'only the owner');
+select pg_temp.expect_error(format($$ select public.close_invite('%s') $$, :'link'), 'only the owner');
+select pg_temp.act_as(:'founder');
+select code as link_2 from public.create_invite(5, 7) \gset
+select public.close_invite(:'link_2');
+reset role;
+do $$ begin
+  assert public.check_signup((select code from public.invites where max_uses = 5), 'fresh_name', 'a@b.c') ilike '%expired%', 'closed link refused';
+end $$;
 
 -- anon sees nothing
 select pg_temp.act_as(null);

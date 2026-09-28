@@ -42,10 +42,7 @@ export default async function Home() {
           conversation fade by morning.
         </p>
         <div className="animate-rise flex flex-wrap gap-3" style={{ '--i': 3 } as CSSProperties}>
-          <ButtonLink href="/join">I have an invite</ButtonLink>
-          <ButtonLink href="/login" variant="secondary">
-            Member sign in
-          </ButtonLink>
+          <ButtonLink href="/login">Member sign in</ButtonLink>
         </div>
       </section>
 

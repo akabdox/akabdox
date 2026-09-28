@@ -7,18 +7,20 @@ import { signUp } from '../actions'
 
 export const metadata: Metadata = { title: 'Join' }
 
+// Invitees arrive through the owner's link (/join?code=...). The code rides
+// along hidden; without one, only the owner's own email can sign up.
 export default async function JoinPage({ searchParams }: { searchParams: Promise<{ code?: string }> }) {
   const { code } = await searchParams
   return (
     <>
       <div className="grid gap-2">
         <h1 className="text-[32px]">Claim your seat.</h1>
-        <p className="text-ink-2">A member invited you. The code is on your invitation.</p>
+        <p className="text-ink-2">
+          {code ? 'You were invited. Choose how you appear to other readers.' : 'Membership is by invitation. Open the link the owner sent you.'}
+        </p>
       </div>
       <ActionForm action={signUp}>
-        <Field label="Invite code">
-          <Input name="invite_code" defaultValue={code} required autoCapitalize="characters" className="uppercase tracking-[0.2em]" />
-        </Field>
+        <input type="hidden" name="invite_code" value={code ?? ''} />
         <Field label="Username" hint="Letters, numbers, underscores.">
           <Input name="username" required pattern="[A-Za-z0-9_]{3,24}" autoComplete="username" />
         </Field>

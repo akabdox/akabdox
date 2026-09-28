@@ -44,3 +44,18 @@ export async function markRefunded(_: ActionState, form: FormData): Promise<Acti
   const { error } = await supabase.rpc('admin_mark_refunded', { p_tx: field(form, 'id') })
   return done(error)
 }
+
+export async function createInviteLink(_: ActionState, form: FormData): Promise<ActionState> {
+  const supabase = await createClient()
+  const { error } = await supabase.rpc('create_invite', {
+    p_max_uses: Number(field(form, 'max_uses')),
+    p_valid_days: Number(field(form, 'valid_days')),
+  })
+  return done(error, 'Link created. Copy it below and share it.')
+}
+
+export async function closeInviteLink(_: ActionState, form: FormData): Promise<ActionState> {
+  const supabase = await createClient()
+  const { error } = await supabase.rpc('close_invite', { p_code: field(form, 'code') })
+  return done(error)
+}

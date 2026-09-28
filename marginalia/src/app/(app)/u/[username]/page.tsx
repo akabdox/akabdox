@@ -63,7 +63,7 @@ export default async function ProfilePage({
 
   const [{ data: shelfRows }, { data: settingsRow }] = await Promise.all([
     supabase.from('shelf_items').select(SHELF_SELECT).eq('owner_id', profile.id).order('created_at', { ascending: false }),
-    supabase.from('settings').select('commission_bps, currency, member_cap, invites_per_member').maybeSingle(),
+    supabase.from('settings').select('commission_bps, currency').maybeSingle(),
   ])
   const shelf = (shelfRows ?? []) as unknown as ShelfItem[]
   const settings = (settingsRow ?? { commission_bps: 700, currency: 'DZD' }) as Settings

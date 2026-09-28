@@ -1,6 +1,6 @@
 # Marginalia
 
-A private, invite only community for 1,000 readers. Members post thoughts and reviews, keep a shelf of the books they own, sell or swap copies to each other, and talk in chat rooms that clear themselves.
+A private community for 1,000 readers. Members post thoughts and reviews, keep a shelf of the books they own, sell or swap copies to each other, and talk in chat rooms that clear themselves.
 
 Working name. Rename it in `src/lib/site.ts`.
 
@@ -47,7 +47,7 @@ src/
 | Table | Holds |
 | --- | --- |
 | `profiles` | Members. Created by a trigger on sign up, only with a valid invite |
-| `invites` | Codes. Each member gets 3; the founder is unlimited |
+| `invites` | Owner-only invite links, each with a seat limit and an expiry |
 | `books` | Shared catalogue, deduplicated by ISBN or by title and author |
 | `shelf_items` | One row per copy a member owns: reading status, open to swap, condition |
 | `listings` | A copy on the market. One open listing per copy |
@@ -78,7 +78,7 @@ Every message gets `expires_at` from its room: 24 hours in The Reading Room, 7 d
 
 ## Security
 
-Deny by default. The migrations revoke every table and function privilege Supabase grants automatically, then grant back only what each role needs, down to the column: a member can edit their shelf's reading status but not its owner, a listing's price but not its status. Anonymous visitors can call exactly one function, the invite check on the join page. Money and ownership changes only happen inside `security definer` functions.
+Deny by default. The migrations revoke every table and function privilege Supabase grants automatically, then grant back only what each role needs, down to the column: a member can edit their shelf's reading status but not its owner, a listing's price but not its status. Anonymous visitors can call exactly one function, the invite check on the join page. Only the owner can create or close invite links. Money and ownership changes only happen inside `security definer` functions.
 
 ## Setup
 
@@ -87,7 +87,7 @@ Deny by default. The migrations revoke every table and function privilege Supaba
 3. In the SQL editor, set the founder: `update public.settings set founder_email = 'you@yourdomain.com';`
 4. Copy `.env.example` to `.env.local` and fill it in.
 5. `npm install && npm run dev`
-6. Open `/join` and sign up with the founder email. The invite field accepts anything for that one address. You become admin and can issue invites from Settings.
+6. Open `/join` and sign up with the founder email; no link is needed for that one address. You become admin. Create invite links in Admin, choose how many seats each one has and how long it stays open, and share them.
 
 For payments, add `CHARGILY_SECRET_KEY` and set the webhook URL in the Chargily dashboard to `https://<your domain>/api/payments/chargily`. Without a key the app runs in manual mode.
 

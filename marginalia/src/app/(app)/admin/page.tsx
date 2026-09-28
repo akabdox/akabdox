@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { PageHeader } from '@/components/page-header'
+import { CopyButton } from '@/components/copy-button'
 import { TransactionBadge } from '@/components/status'
+import { Badge } from '@/components/ui/badge'
 import { ActionForm } from '@/components/ui/action-form'
 import { Field, Input } from '@/components/ui/field'
 import { Rule } from '@/components/ui/rule'
@@ -10,11 +12,14 @@ import { requireAdmin } from '@/lib/viewer'
 import { TRANSACTION_SELECT } from '@/lib/queries'
 import { formatMoney } from '@/lib/money'
 import { formatDate } from '@/lib/time'
+import { siteUrl } from '@/lib/site'
 import type { ActionState } from '@/lib/form'
 import type { Transaction } from '@/lib/types'
-import { cancel, markPaidOut, markRefunded, setCommission, settle } from './actions'
+import { cancel, closeInviteLink, createInviteLink, markPaidOut, markRefunded, setCommission, settle } from './actions'
 
 export const metadata: Metadata = { title: 'Admin' }
+
+type InviteLink = { code: string; max_uses: number; uses: number; expires_at: string; created_at: string }
 
 type Summary = {
   currency: string
@@ -43,10 +48,13 @@ function RowAction({ id, label, action }: { id: string; label: string; action: (
 export default async function AdminPage() {
   await requireAdmin()
   const supabase = await createClient()
-  const [{ data: summaryRow }, { data: rows }] = await Promise.all([
+  const [{ data: summaryRow }, { data: rows }, { data: inviteRows }] = await Promise.all([
     supabase.rpc('admin_summary'),
     supabase.from('transactions').select(TRANSACTION_SELECT).order('created_at', { ascending: false }).limit(100),
+    supabase.from('invites').select('code, max_uses, uses, expires_at, created_at').order('created_at', { ascending: false }).limit(50),
   ])
+  const links = (inviteRows ?? []) as InviteLink[]
+  const now = Date.now()
   const s = summaryRow as Summary
   const txs = (rows ?? []) as unknown as Transaction[]
   const money = (minor: number) => formatMoney(minor, s.currency)
@@ -74,6 +82,55 @@ export default async function AdminPage() {
           </div>
         ))}
       </dl>
+
+      <section className="grid gap-4">
+        <Rule label="Invite links" />
+        <p className="max-w-lg text-[14px] text-ink-2">
+          Only you can invite. Create a link, choose how many people it can seat and how long it stays open, then share it.
+        </p>
+        <ActionForm action={createInviteLink} className="max-w-md">
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Seats">
+              <Input name="max_uses" type="number" min="1" max="1000" defaultValue={10} required />
+            </Field>
+            <Field label="Open for (days)">
+              <Input name="valid_days" type="number" min="1" max="365" defaultValue={14} required />
+            </Field>
+          </div>
+          <SubmitButton size="sm" className="justify-self-start" pendingLabel="Creating">
+            Create link
+          </SubmitButton>
+        </ActionForm>
+        {links.map((l) => {
+          const url = `${siteUrl()}/join?code=${l.code}`
+          const open = l.uses < l.max_uses && Date.parse(l.expires_at) > now
+          return (
+            <div key={l.code} className="grid gap-3 border-b border-rule pb-4 sm:grid-cols-[1fr_auto] sm:items-center">
+              <div className="grid min-w-0 gap-1">
+                <span className="truncate text-[14px] font-medium">{url}</span>
+                <span className="tabular text-[12px] text-ink-3">
+                  {l.uses} of {l.max_uses} seats used · {open ? `open until ${formatDate(l.expires_at)}` : `closed ${formatDate(l.expires_at)}`}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {open ? (
+                  <>
+                    <CopyButton text={url} />
+                    <ActionForm action={closeInviteLink} className="gap-1">
+                      <input type="hidden" name="code" value={l.code} />
+                      <SubmitButton size="sm" variant="danger">
+                        Close
+                      </SubmitButton>
+                    </ActionForm>
+                  </>
+                ) : (
+                  <Badge tone="muted">{l.uses >= l.max_uses ? 'Full' : 'Closed'}</Badge>
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </section>
 
       <section className="grid max-w-sm gap-4">
         <Rule label="Commission" />

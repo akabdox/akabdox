@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { ActionForm } from '@/components/ui/action-form'
 import { Field, Input } from '@/components/ui/field'
 import { SubmitButton } from '@/components/ui/submit-button'
@@ -25,12 +24,6 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         </Field>
         <SubmitButton pendingLabel="Signing in">Sign in</SubmitButton>
       </ActionForm>
-      <p className="text-[14px] text-ink-3">
-        Have an invite?{' '}
-        <Link href="/join" className="text-ink underline underline-offset-4">
-          Claim your seat
-        </Link>
-      </p>
     </>
   )
 }

@@ -123,5 +123,4 @@ export interface Settings {
   commission_bps: number
   currency: string
   member_cap: number
-  invites_per_member: number
 }

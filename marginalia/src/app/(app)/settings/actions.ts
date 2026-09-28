@@ -19,12 +19,3 @@ export async function updateProfile(_: ActionState, form: FormData): Promise<Act
   revalidatePath('/', 'layout')
   return { ok: 'Profile saved.' }
 }
-
-export async function createInvite(_: ActionState): Promise<ActionState> {
-  const supabase = await createClient()
-  const { error } = await supabase.rpc('create_invite')
-  if (error) return { error: friendlyError(error) }
-  revalidatePath('/settings')
-  revalidatePath('/admin')
-  return null
-}
