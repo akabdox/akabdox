@@ -96,6 +96,8 @@ Deny by default. The migrations revoke every table and function privilege Supaba
 5. `npm install && npm run dev`
 6. Open `/join` and sign up with the founder email. You become admin. Everyone else signs up at `/join` too and sees the welcome guide on first visit.
 
+**Payments are off by default.** The market works like classifieds: buyers message the seller and agree on payment and delivery directly, and Fahrasa takes no commission. To turn on checkout, commission and the Orders page later, set `PAYMENTS_ENABLED=true`.
+
 For payments, add `CHARGILY_SECRET_KEY` and set the webhook URL in the Chargily dashboard to `https://<your domain>/api/payments/chargily`. Without a key the app runs in manual mode.
 
 ## Checks

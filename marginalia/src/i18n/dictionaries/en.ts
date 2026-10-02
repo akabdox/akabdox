@@ -41,7 +41,7 @@ export const en = {
       title: 'Three things, done well.',
       steps: [
         ['Shelve', 'Add the books you own in seconds. Mark what you are reading, what you finished, what you would let go.'],
-        ['Swap or sell', 'Open a book to swap or set a price. Buyers pay through Fahrasa by CIB, Edahabia or CCP. Meet in person or ship it.'],
+        ['Swap or sell', 'Open a book to swap or set a price. Buyers message the seller directly and agree on payment and delivery: by hand, or shipped.'],
         ['Talk', 'Post a thought or a review. Chat rooms clear themselves, so the conversation stays light.'],
       ] as [string, string][],
     },
@@ -67,8 +67,8 @@ export const en = {
       eyebrow: '05 · Questions',
       title: 'Before you join.',
       items: [
-        ['Is it free?', 'Yes. Joining, shelving, posting and chatting cost nothing. Fahrasa takes a small commission only when a book is sold.'],
-        ['How do payments work?', 'Buyers pay by CIB or Edahabia card, or by CCP and BaridiMob transfer. The seller receives the price minus the commission.'],
+        ['Is it free?', 'Yes. Joining, shelving, posting, chatting and selling are all free. Fahrasa takes no commission.'],
+        ['How do I pay for a book?', 'Directly to the seller, not through Fahrasa. Agree in the chat: cash on hand over, or a CCP or BaridiMob transfer.'],
         ['How does the book reach me?', 'You agree with the seller: hand it over in person, or ship it with a delivery company.'],
         ['Do I need an ISBN?', 'No. It only fills in the details faster. Old copies and books you wrote yourself are welcome.'],
         ['Are my messages kept?', 'No. Rooms clear themselves, and direct messages disappear after a week.'],
@@ -146,7 +146,7 @@ export const en = {
     steps: [
       ['Build your shelf', 'Add the books you own. The ISBN is optional: use it to fill the details, skip it for old copies or books you wrote yourself.'],
       ['Say what you are reading', 'Post a thought, a review or an idea in the feed. Reply to other readers.'],
-      ['Swap or sell', 'Mark a book open to swap, or list it for sale. Payment goes through Fahrasa, and the book moves to the buyer’s shelf.'],
+      ['Swap or sell', 'Mark a book open to swap, or list it with a price. Buyers message you, and you agree on payment and delivery together.'],
       ['Talk', 'Chat rooms clear themselves. Direct messages fade after a week. Nothing is kept forever.'],
     ] as [string, string][],
     addBook: 'Add my first book',
@@ -246,7 +246,9 @@ export const en = {
   market: {
     eyebrow: 'Peer to peer',
     title: 'Market',
-    intro: 'Copies from members’ shelves. Pay here, meet or ship, and the book moves to your shelf.',
+    intro: 'Copies from members’ shelves. Message the seller, agree on payment, then meet or ship.',
+    contactNote: 'Fahrasa does not handle payment. Agree on price, payment and delivery with the seller in the chat.',
+    soldHint: 'Sold it? Remove it from the market.',
     searchPlaceholder: 'Title or author',
     searchLabel: 'Search the market',
     search: 'Search',

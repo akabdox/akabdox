@@ -8,9 +8,11 @@ import { chargilyEnabled, createCheckout } from '@/lib/payments/chargily'
 import { field, friendlyError, type ActionState } from '@/lib/form'
 import { siteUrl } from '@/lib/site'
 import { getDict } from '@/i18n/server'
+import { paymentsEnabled } from '@/lib/features'
 
 export async function buy(_: ActionState, form: FormData): Promise<ActionState> {
   const t = await getDict()
+  if (!paymentsEnabled) return { error: t.market.contactNote }
   const supabase = await createClient()
   const { data, error } = await supabase.rpc('create_order', { p_listing: field(form, 'listing_id') })
   if (error || !data) return { error: friendlyError(error, t) }

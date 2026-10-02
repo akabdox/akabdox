@@ -5,6 +5,7 @@ import { Monogram } from './ui/monogram'
 import { site } from '@/lib/site'
 import type { Profile } from '@/lib/types'
 import { getDict } from '@/i18n/server'
+import { paymentsEnabled } from '@/lib/features'
 
 export async function Nav({ viewer }: { viewer: Profile }) {
   const t = await getDict()
@@ -36,9 +37,11 @@ export async function Nav({ viewer }: { viewer: Profile }) {
                 {t.nav.admin}
               </NavLink>
             ) : null}
-            <NavLink href="/orders" className="hidden md:inline">
-              {t.nav.orders}
-            </NavLink>
+            {paymentsEnabled ? (
+              <NavLink href="/orders" className="hidden md:inline">
+                {t.nav.orders}
+              </NavLink>
+            ) : null}
             <ThemeToggle labels={{ light: t.theme.light, dark: t.theme.dark }} />
             <Link href="/settings" aria-label={t.nav.settings}>
               <Monogram name={viewer.display_name} size="sm" />

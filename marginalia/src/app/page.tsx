@@ -17,6 +17,7 @@ import { site } from '@/lib/site'
 import { cn } from '@/lib/cn'
 import { intlTag, type Locale } from '@/i18n/config'
 import { getI18n } from '@/i18n/server'
+import { paymentsEnabled } from '@/lib/features'
 import type { ListingWithBook, ShelfItem } from '@/lib/types'
 
 // Counts only appear once they help: a page that says "4 readers" sells nothing.
@@ -292,9 +293,13 @@ export default async function Home() {
                 <ListingCard key={l.id} listing={l} locale={locale} index={i} />
               ))}
             </div>
-            <div className="border-t border-rule pt-4">
-              <PriceBreakdown amountMinor={75000} bps={700} currency="DZD" locale={locale} labels={breakdownLabels} />
-            </div>
+            {paymentsEnabled ? (
+              <div className="border-t border-rule pt-4">
+                <PriceBreakdown amountMinor={75000} bps={700} currency="DZD" locale={locale} labels={breakdownLabels} />
+              </div>
+            ) : (
+              <p className="border-t border-rule pt-4 text-[13px] text-ink-3">{t.market.contactNote}</p>
+            )}
           </div>
           <div className="grid content-start gap-5 border border-rule bg-surface p-5">
             <p className="eyebrow">{L.inside.chat}</p>

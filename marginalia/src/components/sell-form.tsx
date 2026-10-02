@@ -18,6 +18,7 @@ export function SellForm({
   currency,
   locale,
   labels,
+  showBreakdown,
   action,
 }: {
   shelfItemId: string
@@ -25,6 +26,7 @@ export function SellForm({
   currency: string
   locale: Locale
   labels: SellLabels
+  showBreakdown: boolean
   action: (state: ActionState, form: FormData) => Promise<ActionState>
 }) {
   const [price, setPrice] = useState('')
@@ -39,7 +41,7 @@ export function SellForm({
       <Field label={labels.note}>
         <Textarea name="description" rows={2} maxLength={1000} placeholder={labels.notePlaceholder} />
       </Field>
-      {minor > 0 ? <PriceBreakdown amountMinor={minor} bps={bps} currency={currency} locale={locale} labels={labels} /> : null}
+      {showBreakdown && minor > 0 ? <PriceBreakdown amountMinor={minor} bps={bps} currency={currency} locale={locale} labels={labels} /> : null}
       <SubmitButton pendingLabel={labels.pending}>{labels.submit}</SubmitButton>
     </ActionForm>
   )

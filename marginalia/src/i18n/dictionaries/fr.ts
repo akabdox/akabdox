@@ -43,7 +43,7 @@ export const fr: Dict = {
       title: 'Trois choses, bien faites.',
       steps: [
         ['Ranger', 'Ajoutez vos livres en quelques secondes. Indiquez ce que vous lisez, ce que vous avez fini, ce dont vous vous sépareriez.'],
-        ['Échanger ou vendre', 'Proposez un livre à l’échange ou fixez un prix. L’acheteur paie via Fahrasa par CIB, Edahabia ou CCP. Remise en main propre ou par envoi.'],
+        ['Échanger ou vendre', 'Proposez un livre à l’échange ou fixez un prix. L’acheteur écrit au vendeur et ils s’entendent sur le paiement et la remise : en main propre ou par envoi.'],
         ['Discuter', 'Publiez une pensée ou une critique. Les salons s’effacent d’eux-mêmes, la conversation reste légère.'],
       ],
     },
@@ -69,8 +69,8 @@ export const fr: Dict = {
       eyebrow: '05 · Questions',
       title: 'Avant de vous inscrire.',
       items: [
-        ['Est-ce gratuit ?', 'Oui. S’inscrire, ranger ses livres, publier et discuter ne coûtent rien. Fahrasa prend une petite commission uniquement quand un livre est vendu.'],
-        ['Comment fonctionnent les paiements ?', 'L’acheteur paie par carte CIB ou Edahabia, ou par virement CCP et BaridiMob. Le vendeur reçoit le prix moins la commission.'],
+        ['Est-ce gratuit ?', 'Oui. S’inscrire, ranger ses livres, publier, discuter et vendre sont gratuits. Fahrasa ne prend aucune commission.'],
+        ['Comment payer un livre ?', 'Directement au vendeur, pas via Fahrasa. Mettez-vous d’accord dans la discussion : espèces à la remise, ou virement CCP ou BaridiMob.'],
         ['Comment le livre m’arrive-t-il ?', 'Vous vous arrangez avec le vendeur : remise en main propre, ou envoi par une société de livraison.'],
         ['Faut-il un ISBN ?', 'Non. Il sert seulement à remplir les détails plus vite. Les vieux exemplaires et les livres que vous avez écrits sont les bienvenus.'],
         ['Mes messages sont-ils conservés ?', 'Non. Les salons s’effacent d’eux-mêmes et les messages privés disparaissent après une semaine.'],
@@ -147,7 +147,7 @@ export const fr: Dict = {
     steps: [
       ['Remplissez votre étagère', 'Ajoutez les livres que vous possédez. L’ISBN est facultatif : il remplit les détails, mais vous pouvez l’ignorer pour un vieux livre ou un livre que vous avez écrit.'],
       ['Dites ce que vous lisez', 'Publiez une pensée, une critique ou une idée dans le fil. Répondez aux autres lecteurs.'],
-      ['Échangez ou vendez', 'Proposez un livre à l’échange ou mettez-le en vente. Le paiement passe par Fahrasa et le livre rejoint l’étagère de l’acheteur.'],
+      ['Échangez ou vendez', 'Proposez un livre à l’échange ou mettez-le en vente. L’acheteur vous écrit, et vous vous entendez ensemble sur le paiement et la remise.'],
       ['Discutez', 'Les salons s’effacent d’eux-mêmes. Les messages privés disparaissent après une semaine. Rien n’est gardé pour toujours.'],
     ],
     addBook: 'Ajouter mon premier livre',
@@ -247,7 +247,9 @@ export const fr: Dict = {
   market: {
     eyebrow: 'Entre lecteurs',
     title: 'Marché',
-    intro: 'Des exemplaires venus des étagères des membres. Payez ici, remettez en main propre ou par envoi, et le livre rejoint votre étagère.',
+    intro: 'Des exemplaires venus des étagères des membres. Écrivez au vendeur, mettez-vous d’accord sur le paiement, puis remise en main propre ou envoi.',
+    contactNote: 'Fahrasa ne gère pas le paiement. Mettez-vous d’accord avec le vendeur sur le prix, le paiement et la remise dans la discussion.',
+    soldHint: 'Vendu ? Retirez-le du marché.',
     searchPlaceholder: 'Titre ou auteur',
     searchLabel: 'Chercher sur le marché',
     search: 'Chercher',

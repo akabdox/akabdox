@@ -21,6 +21,7 @@ import { IsbnField } from '@/components/isbn-field'
 import { formatRate } from '@/lib/commission'
 import { currencyLabel } from '@/lib/money'
 import { getI18n } from '@/i18n/server'
+import { paymentsEnabled } from '@/lib/features'
 import { openDirect } from '../../chat/actions'
 
 type Filter = 'all' | 'reading' | 'read' | 'swap' | 'sale'
@@ -224,6 +225,7 @@ export default async function ProfilePage({
                             currency={settings.currency}
                             locale={locale}
                             labels={sellLabels}
+                            showBreakdown={paymentsEnabled}
                             action={listForSale}
                           />
                         )}

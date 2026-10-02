@@ -15,6 +15,7 @@ import { formatDate } from '@/lib/time'
 import { isUuid } from '@/lib/uuid'
 import type { ListingWithBook } from '@/lib/types'
 import { buy } from '../actions'
+import { paymentsEnabled } from '@/lib/features'
 import { openDirect } from '../../chat/actions'
 import { formatRate } from '@/lib/commission'
 import { getDict, getI18n } from '@/i18n/server'
@@ -84,26 +85,35 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
           {own ? (
             <div className="max-w-sm border border-rule bg-surface p-5">
               <p className="eyebrow mb-4">{t.market.yourListing}</p>
-              <PriceBreakdown
-                amountMinor={listing.price_minor}
-                bps={bps}
-                currency={listing.currency}
-                locale={locale}
-                labels={{ buyerPays: t.sell.buyerPays, commission: t.sell.commission(formatRate(bps)), youReceive: t.sell.youReceive }}
-              />
+              {paymentsEnabled ? (
+                <PriceBreakdown
+                  amountMinor={listing.price_minor}
+                  bps={bps}
+                  currency={listing.currency}
+                  locale={locale}
+                  labels={{ buyerPays: t.sell.buyerPays, commission: t.sell.commission(formatRate(bps)), youReceive: t.sell.youReceive }}
+                />
+              ) : (
+                <p className="text-[14px] text-ink-2">{t.market.soldHint}</p>
+              )}
             </div>
           ) : listing.status === 'active' ? (
-            <div className="flex flex-wrap items-start gap-3">
-              <ActionForm action={buy}>
-                <input type="hidden" name="listing_id" value={listing.id} />
-                <SubmitButton pendingLabel={t.market.reserving}>{t.market.buy}</SubmitButton>
-              </ActionForm>
-              <form action={openDirect}>
-                <input type="hidden" name="user_id" value={listing.seller_id} />
-                <Button type="submit" variant="secondary">
-                  {t.market.messageSeller}
-                </Button>
-              </form>
+            <div className="grid max-w-md gap-3">
+              <div className="flex flex-wrap items-start gap-3">
+                {paymentsEnabled ? (
+                  <ActionForm action={buy}>
+                    <input type="hidden" name="listing_id" value={listing.id} />
+                    <SubmitButton pendingLabel={t.market.reserving}>{t.market.buy}</SubmitButton>
+                  </ActionForm>
+                ) : null}
+                <form action={openDirect}>
+                  <input type="hidden" name="user_id" value={listing.seller_id} />
+                  <Button type="submit" variant={paymentsEnabled ? 'secondary' : 'primary'}>
+                    {t.market.messageSeller}
+                  </Button>
+                </form>
+              </div>
+              {paymentsEnabled ? null : <p className="text-[13px] text-ink-3">{t.market.contactNote}</p>}
             </div>
           ) : (
             <p className="text-ink-3">{t.market.unavailable}</p>
