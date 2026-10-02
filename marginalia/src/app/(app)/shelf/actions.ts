@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { field, friendlyError, optionalField, type ActionState } from '@/lib/form'
 import { parseMoney } from '@/lib/money'
+import { findBook, normalizeIsbn, type BookDetails } from '@/lib/isbn'
+import { getDict } from '@/i18n/server'
 
 async function refreshShelf() {
   const supabase = await createClient()
@@ -13,7 +15,16 @@ async function refreshShelf() {
   revalidatePath('/market')
 }
 
+export async function lookupIsbn(raw: string): Promise<{ book?: BookDetails; error?: string }> {
+  const t = await getDict()
+  const isbn = normalizeIsbn(raw)
+  if (!isbn) return { error: t.shelf.lookupBad }
+  const book = await findBook(isbn)
+  return book ? { book } : { error: t.shelf.lookupMiss }
+}
+
 export async function addBook(_: ActionState, form: FormData): Promise<ActionState> {
+  const t = await getDict()
   const year = Number(field(form, 'year'))
   const supabase = await createClient()
   const { error } = await supabase.rpc('add_to_shelf', {
@@ -26,12 +37,13 @@ export async function addBook(_: ActionState, form: FormData): Promise<ActionSta
     p_condition: optionalField(form, 'condition'),
     p_open_to_swap: form.get('open_to_swap') === 'on',
   })
-  if (error) return { error: friendlyError(error) }
+  if (error) return { error: friendlyError(error, t) }
   await refreshShelf()
-  return { ok: 'Added to your shelf.' }
+  return { ok: t.shelf.added }
 }
 
 export async function updateShelfItem(_: ActionState, form: FormData): Promise<ActionState> {
+  const t = await getDict()
   const supabase = await createClient()
   const { error } = await supabase
     .from('shelf_items')
@@ -42,37 +54,40 @@ export async function updateShelfItem(_: ActionState, form: FormData): Promise<A
       note: optionalField(form, 'note'),
     })
     .eq('id', field(form, 'id'))
-  if (error) return { error: friendlyError(error) }
+  if (error) return { error: friendlyError(error, t) }
   await refreshShelf()
-  return { ok: 'Saved.' }
+  return { ok: t.shelf.saved }
 }
 
 export async function removeShelfItem(_: ActionState, form: FormData): Promise<ActionState> {
+  const t = await getDict()
   const supabase = await createClient()
   const { error } = await supabase.from('shelf_items').delete().eq('id', field(form, 'id'))
-  if (error) return { error: friendlyError(error) }
+  if (error) return { error: friendlyError(error, t) }
   await refreshShelf()
   return null
 }
 
 export async function listForSale(_: ActionState, form: FormData): Promise<ActionState> {
+  const t = await getDict()
   const price = parseMoney(field(form, 'price'))
-  if (!price || price < 10000) return { error: 'Set a price of at least 100.' }
+  if (!price || price < 10000) return { error: t.shelf.priceMin }
   const supabase = await createClient()
   const { error } = await supabase.rpc('list_for_sale', {
     p_shelf_item: field(form, 'shelf_item_id'),
     p_price_minor: price,
     p_description: optionalField(form, 'description'),
   })
-  if (error) return { error: friendlyError(error) }
+  if (error) return { error: friendlyError(error, t) }
   await refreshShelf()
-  return { ok: 'Listed on the market.' }
+  return { ok: t.shelf.listed }
 }
 
 export async function withdrawListing(_: ActionState, form: FormData): Promise<ActionState> {
+  const t = await getDict()
   const supabase = await createClient()
   const { error } = await supabase.rpc('withdraw_listing', { p_listing: field(form, 'listing_id') })
-  if (error) return { error: friendlyError(error) }
+  if (error) return { error: friendlyError(error, t) }
   await refreshShelf()
   return null
 }

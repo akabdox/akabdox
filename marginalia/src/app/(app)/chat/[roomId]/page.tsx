@@ -7,8 +7,11 @@ import { requireViewer } from '@/lib/viewer'
 import { describeInterval } from '@/lib/time'
 import { isUuid } from '@/lib/uuid'
 import type { Author, Message, Room } from '@/lib/types'
+import { getDict, getI18n } from '@/i18n/server'
 
-export const metadata: Metadata = { title: 'Chat' }
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getDict()).chat.title }
+}
 
 type Row = Message & { author: Author }
 
@@ -16,6 +19,7 @@ export default async function RoomPage({ params }: { params: Promise<{ roomId: s
   const { roomId } = await params
   if (!isUuid(roomId)) notFound()
   const viewer = await requireViewer()
+  const { locale, t } = await getI18n()
   const supabase = await createClient()
 
   const [{ data: room }, { data: members }, { data: rows }] = await Promise.all([
@@ -38,22 +42,31 @@ export default async function RoomPage({ params }: { params: Promise<{ roomId: s
   for (const m of memberRows) people[m.user_id] = m.profile
   const other = memberRows.find((m) => m.user_id !== viewer.id)?.profile
 
-  const title = r.kind === 'public' ? r.name : (other?.display_name ?? 'Conversation')
+  const title = r.kind === 'public' ? ((r.name && t.chat.roomNames[r.name]) ?? r.name) : (other?.display_name ?? t.chat.conversation)
 
   return (
     <div className="mx-auto grid max-w-2xl gap-6">
       <header className="grid gap-2">
         <Link href="/chat" className="eyebrow hover:text-ink">
-          ← Chat
+          {t.back(t.nav.chat)}
         </Link>
         <h1 className="text-[30px]">{title}</h1>
-        <p className="text-[13px] text-ink-3">Messages disappear {describeInterval(r.message_ttl)} after they are sent.</p>
+        <p className="text-[13px] text-ink-3">{t.chat.disappears(describeInterval(r.message_ttl, locale))}</p>
       </header>
       <ChatRoom
         roomId={r.id}
         viewerId={viewer.id}
         initialMessages={messages.map(({ author: _author, ...m }) => m)}
         initialPeople={people}
+        locale={locale}
+        labels={{
+          empty: t.chat.empty,
+          placeholder: t.chat.placeholder,
+          messageLabel: t.chat.messageLabel,
+          send: t.chat.send,
+          notSent: t.chat.notSent,
+          disappearsIn: t.chat.disappearsIn('{span}'),
+        }}
       />
     </div>
   )

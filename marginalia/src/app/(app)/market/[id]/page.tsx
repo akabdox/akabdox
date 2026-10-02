@@ -16,15 +16,18 @@ import { isUuid } from '@/lib/uuid'
 import type { ListingWithBook } from '@/lib/types'
 import { buy } from '../actions'
 import { openDirect } from '../../chat/actions'
+import { formatRate } from '@/lib/commission'
+import { getDict, getI18n } from '@/i18n/server'
 
-export const metadata: Metadata = { title: 'Listing' }
-
-const conditionLabel = { new: 'New', fine: 'Fine', good: 'Good', worn: 'Worn' }
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getDict()).market.listing }
+}
 
 export default async function ListingPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   if (!isUuid(id)) notFound()
   const viewer = await requireViewer()
+  const { locale, t } = await getI18n()
   const supabase = await createClient()
 
   const [{ data }, { data: settings }] = await Promise.all([
@@ -34,11 +37,12 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
   if (!data) notFound()
   const listing = data as unknown as ListingWithBook
   const own = listing.seller_id === viewer.id
+  const bps = settings?.commission_bps ?? 700
 
   return (
     <div className="grid gap-10">
       <Link href="/market" className="eyebrow hover:text-ink">
-        ← Market
+        {t.back(t.nav.market)}
       </Link>
 
       <div className="grid gap-10 md:grid-cols-[auto_1fr]">
@@ -54,49 +58,55 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
             </p>
           </div>
 
-          <p className="tabular text-[28px] font-medium">{formatMoney(listing.price_minor, listing.currency)}</p>
+          <p className="tabular text-[28px] font-medium">{formatMoney(listing.price_minor, listing.currency, locale)}</p>
 
           <dl className="grid max-w-sm grid-cols-[120px_1fr] gap-y-2 text-[14px]">
-            <dt className="eyebrow self-center">Seller</dt>
+            <dt className="eyebrow self-center">{t.market.seller}</dt>
             <dd>
               <Link href={`/u/${listing.seller.username}`} className="hover:underline">
                 {listing.seller.display_name}
               </Link>
             </dd>
-            <dt className="eyebrow self-center">Format</dt>
-            <dd className="capitalize">{listing.format}</dd>
+            <dt className="eyebrow self-center">{t.market.format}</dt>
+            <dd>{t.formats[listing.format]}</dd>
             {listing.condition ? (
               <>
-                <dt className="eyebrow self-center">Condition</dt>
-                <dd>{conditionLabel[listing.condition]}</dd>
+                <dt className="eyebrow self-center">{t.market.condition}</dt>
+                <dd>{t.conditions[listing.condition]}</dd>
               </>
             ) : null}
-            <dt className="eyebrow self-center">Listed</dt>
-            <dd>{formatDate(listing.created_at)}</dd>
+            <dt className="eyebrow self-center">{t.market.listed}</dt>
+            <dd>{formatDate(listing.created_at, locale)}</dd>
           </dl>
 
-          {listing.description ? <p className="reading max-w-lg whitespace-pre-line">{listing.description}</p> : null}
+          {listing.description ? <p dir="auto" className="reading max-w-lg whitespace-pre-line">{listing.description}</p> : null}
 
           {own ? (
             <div className="max-w-sm border border-rule bg-surface p-5">
-              <p className="eyebrow mb-4">Your listing</p>
-              <PriceBreakdown amountMinor={listing.price_minor} bps={settings?.commission_bps ?? 700} currency={listing.currency} />
+              <p className="eyebrow mb-4">{t.market.yourListing}</p>
+              <PriceBreakdown
+                amountMinor={listing.price_minor}
+                bps={bps}
+                currency={listing.currency}
+                locale={locale}
+                labels={{ buyerPays: t.sell.buyerPays, commission: t.sell.commission(formatRate(bps)), youReceive: t.sell.youReceive }}
+              />
             </div>
           ) : listing.status === 'active' ? (
             <div className="flex flex-wrap items-start gap-3">
               <ActionForm action={buy}>
                 <input type="hidden" name="listing_id" value={listing.id} />
-                <SubmitButton pendingLabel="Reserving">Buy this copy</SubmitButton>
+                <SubmitButton pendingLabel={t.market.reserving}>{t.market.buy}</SubmitButton>
               </ActionForm>
               <form action={openDirect}>
                 <input type="hidden" name="user_id" value={listing.seller_id} />
                 <Button type="submit" variant="secondary">
-                  Message seller
+                  {t.market.messageSeller}
                 </Button>
               </form>
             </div>
           ) : (
-            <p className="text-ink-3">This copy is no longer available.</p>
+            <p className="text-ink-3">{t.market.unavailable}</p>
           )}
         </div>
       </div>

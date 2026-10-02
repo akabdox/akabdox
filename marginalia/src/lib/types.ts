@@ -15,6 +15,7 @@ export interface Profile {
   avatar_url: string | null
   role: Role
   created_at: string
+  onboarded_at: string | null
 }
 
 export type Author = Pick<Profile, 'username' | 'display_name'>
@@ -122,5 +123,4 @@ export interface Message {
 export interface Settings {
   commission_bps: number
   currency: string
-  member_cap: number
 }

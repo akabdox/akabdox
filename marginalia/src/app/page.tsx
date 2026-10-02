@@ -1,6 +1,8 @@
 import type { CSSProperties } from 'react'
 import { redirect } from 'next/navigation'
 import { ButtonLink } from '@/components/ui/button'
+import { LanguageSwitcher } from '@/components/language-switcher'
+import { getI18n } from '@/i18n/server'
 import { getViewer } from '@/lib/viewer'
 import { site } from '@/lib/site'
 import { cn } from '@/lib/cn'
@@ -22,31 +24,38 @@ const spines = [
 
 export default async function Home() {
   if (await getViewer()) redirect('/feed')
+  const { t } = await getI18n()
 
   return (
     <main className="flex min-h-dvh flex-col">
       <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-6 sm:px-6">
-        <span className="text-[15px] font-medium uppercase tracking-[0.28em]">{site.name}</span>
-        <ButtonLink href="/login" variant="ghost">
-          Sign in
-        </ButtonLink>
+        <span lang="en" className="text-[15px] font-medium uppercase tracking-[0.28em]">{site.name}</span>
+        <div className="flex items-center gap-6">
+          <LanguageSwitcher className="hidden sm:flex" />
+          <ButtonLink href="/login" variant="ghost">
+            {t.landing.signIn}
+          </ButtonLink>
+        </div>
       </header>
 
       <section className="mx-auto grid w-full max-w-5xl flex-1 content-center gap-7 px-4 py-12 sm:px-6">
-        <p className="eyebrow animate-rise">By invitation · 1,000 seats</p>
+        <p className="eyebrow animate-rise">{t.landing.eyebrow}</p>
         <h1 className="animate-rise max-w-3xl text-[40px] font-medium uppercase leading-[1.02] tracking-[0.04em] sm:text-[64px]" style={{ '--i': 1 } as CSSProperties}>
-          A private library of a thousand readers.
+          {t.landing.title}
         </h1>
         <p className="animate-rise max-w-md text-[17px] text-ink-2" style={{ '--i': 2 } as CSSProperties}>
-          Share what you are reading. Keep a shelf of what you own. Swap it, sell it, talk about it, and let the
-          conversation fade by morning.
+          {t.landing.body}
         </p>
         <div className="animate-rise flex flex-wrap gap-3" style={{ '--i': 3 } as CSSProperties}>
-          <ButtonLink href="/login">Member sign in</ButtonLink>
+          <ButtonLink href="/join">{t.landing.join}</ButtonLink>
+          <ButtonLink href="/login" variant="secondary">
+            {t.landing.signIn}
+          </ButtonLink>
         </div>
+        <LanguageSwitcher className="animate-rise sm:hidden" />
       </section>
 
-      <div aria-hidden className="overflow-hidden border-b border-ink">
+      <div aria-hidden lang="en" className="overflow-hidden border-b border-ink">
         <div className="mx-auto flex max-w-5xl items-end gap-1.5 px-4 sm:px-6">
           {spines.map(([title, height, style], i) => (
             <div

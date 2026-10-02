@@ -3,42 +3,41 @@ import Link from 'next/link'
 import { ActionForm } from '@/components/ui/action-form'
 import { Field, Input } from '@/components/ui/field'
 import { SubmitButton } from '@/components/ui/submit-button'
+import { getDict } from '@/i18n/server'
 import { signUp } from '../actions'
 
-export const metadata: Metadata = { title: 'Join' }
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getDict()).auth.joinLink }
+}
 
-// Invitees arrive through the owner's link (/join?code=...). The code rides
-// along hidden; without one, only the owner's own email can sign up.
-export default async function JoinPage({ searchParams }: { searchParams: Promise<{ code?: string }> }) {
-  const { code } = await searchParams
+// Open to anyone. The founder email becomes admin on sign up.
+export default async function JoinPage() {
+  const t = await getDict()
   return (
     <>
       <div className="grid gap-2">
-        <h1 className="text-[32px]">Claim your seat.</h1>
-        <p className="text-ink-2">
-          {code ? 'You were invited. Choose how you appear to other readers.' : 'Membership is by invitation. Open the link the owner sent you.'}
-        </p>
+        <h1 className="text-[32px]">{t.auth.joinTitle}</h1>
+        <p className="text-ink-2">{t.auth.joinBody}</p>
       </div>
       <ActionForm action={signUp}>
-        <input type="hidden" name="invite_code" value={code ?? ''} />
-        <Field label="Username" hint="Letters, numbers, underscores.">
-          <Input name="username" required pattern="[A-Za-z0-9_]{3,24}" autoComplete="username" />
+        <Field label={t.auth.username} hint={t.auth.usernameHint}>
+          <Input name="username" required pattern="[A-Za-z0-9_]{3,24}" autoComplete="username" dir="ltr" />
         </Field>
-        <Field label="Display name">
+        <Field label={t.auth.displayName}>
           <Input name="display_name" required maxLength={60} autoComplete="name" />
         </Field>
-        <Field label="Email">
-          <Input name="email" type="email" required autoComplete="email" />
+        <Field label={t.auth.email}>
+          <Input name="email" type="email" required autoComplete="email" dir="ltr" />
         </Field>
-        <Field label="Password">
-          <Input name="password" type="password" required minLength={8} autoComplete="new-password" />
+        <Field label={t.auth.password}>
+          <Input name="password" type="password" required minLength={8} autoComplete="new-password" dir="ltr" />
         </Field>
-        <SubmitButton pendingLabel="Joining">Join the library</SubmitButton>
+        <SubmitButton pendingLabel={t.auth.joining}>{t.auth.join}</SubmitButton>
       </ActionForm>
       <p className="text-[14px] text-ink-3">
-        Already a member?{' '}
+        {t.auth.haveAccount}{' '}
         <Link href="/login" className="text-ink underline underline-offset-4">
-          Sign in
+          {t.auth.signInLink}
         </Link>
       </p>
     </>

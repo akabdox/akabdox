@@ -4,49 +4,48 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { field, type ActionState } from '@/lib/form'
 import { siteUrl } from '@/lib/site'
+import { getDict } from '@/i18n/server'
 
 function safeNext(next: string): string {
   return next.startsWith('/') && !next.startsWith('//') ? next : '/feed'
 }
 
 export async function signIn(_: ActionState, form: FormData): Promise<ActionState> {
+  const t = await getDict()
   const supabase = await createClient()
   const { error } = await supabase.auth.signInWithPassword({
     email: field(form, 'email'),
     password: field(form, 'password'),
   })
-  if (error?.code === 'email_not_confirmed') return { error: 'Confirm your email first. Check your inbox for the link.' }
-  if (error) return { error: 'That email and password do not match.' }
+  if (error?.code === 'email_not_confirmed') return { error: t.auth.errors.unconfirmed }
+  if (error) return { error: t.auth.errors.mismatch }
   redirect(safeNext(field(form, 'next')))
 }
 
 export async function signUp(_: ActionState, form: FormData): Promise<ActionState> {
+  const t = await getDict()
   const supabase = await createClient()
-  const code = field(form, 'invite_code')
   const username = field(form, 'username').toLowerCase()
   const email = field(form, 'email')
   const password = field(form, 'password')
 
-  if (password.length < 8) return { error: 'Use at least 8 characters for your password.' }
+  if (password.length < 8) return { error: t.auth.errors.shortPassword }
 
-  const { data: problem, error: checkError } = await supabase.rpc('check_signup', {
-    p_code: code,
-    p_username: username,
-    p_email: email,
-  })
-  if (checkError) return { error: 'Could not check your invite. Try again.' }
-  if (problem) return { error: problem as string }
+  const { data, error: checkError } = await supabase.rpc('check_signup', { p_username: username })
+  if (checkError) return { error: t.auth.errors.checkFailed }
+  const problem = data as string | null
+  if (problem === 'username_invalid' || problem === 'username_taken') return { error: t.auth.errors[problem] }
 
-  const { data, error } = await supabase.auth.signUp({
+  const { data: signup, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       emailRedirectTo: `${siteUrl()}/auth/callback`,
-      data: { invite_code: code, username, display_name: field(form, 'display_name') },
+      data: { username, display_name: field(form, 'display_name') },
     },
   })
   if (error) return { error: error.message }
-  if (!data.session) return { ok: 'Check your inbox to confirm your email, then sign in.' }
+  if (!signup.session) return { ok: t.auth.checkInbox }
   redirect('/feed')
 }
 

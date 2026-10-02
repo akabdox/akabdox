@@ -34,7 +34,7 @@ export function Textarea({ className, rows = 4, ...props }: ComponentProps<'text
 
 export function Select({ className, children, ...props }: ComponentProps<'select'>) {
   return (
-    <select className={cn(control, 'h-11 appearance-none bg-no-repeat px-3 pr-9', className)} style={{ backgroundImage: chevron, backgroundPosition: 'right 12px center', backgroundSize: '10px' }} {...props}>
+    <select className={cn(control, 'select-chevron h-11 appearance-none ps-3 pe-9', className)} {...props}>
       {children}
     </select>
   )
@@ -73,6 +73,3 @@ export function Segmented({
     </div>
   )
 }
-
-const chevron =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%236b6b6b' stroke-width='1.3'/%3E%3C/svg%3E\")"

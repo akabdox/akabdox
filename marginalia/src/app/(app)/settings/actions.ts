@@ -3,8 +3,10 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { field, friendlyError, optionalField, type ActionState } from '@/lib/form'
+import { getDict } from '@/i18n/server'
 
 export async function updateProfile(_: ActionState, form: FormData): Promise<ActionState> {
+  const t = await getDict()
   const supabase = await createClient()
   const { data } = await supabase.auth.getClaims()
   const { error } = await supabase
@@ -15,7 +17,7 @@ export async function updateProfile(_: ActionState, form: FormData): Promise<Act
       bio: optionalField(form, 'bio'),
     })
     .eq('id', data?.claims?.sub ?? '')
-  if (error) return { error: friendlyError(error) }
+  if (error) return { error: friendlyError(error, t) }
   revalidatePath('/', 'layout')
-  return { ok: 'Profile saved.' }
+  return { ok: t.settings.saved }
 }

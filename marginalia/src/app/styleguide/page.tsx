@@ -102,7 +102,7 @@ export default function StyleguidePage() {
         <p className="eyebrow">Design system · v0.1</p>
         <h1 className="text-[32px] uppercase tracking-[0.2em] sm:text-[72px]">{site.name}</h1>
         <p className="max-w-lg text-[17px] text-ink-2">
-          Futura, two values, no hue. Status is carried by form: fill, outline, dash, tint.
+          Inter, two values, no hue. Status is carried by form: fill, outline, dash, tint.
         </p>
       </header>
 
@@ -118,7 +118,7 @@ export default function StyleguidePage() {
         </div>
       </Section>
 
-      <Section title="Type" note="One family. Futura where installed or licensed, Jost everywhere else.">
+      <Section title="Type" note="Inter for Latin script, IBM Plex Sans Arabic for Arabic.">
         <div className="grid gap-6">
           <p className="text-[56px] font-medium leading-none tracking-[-0.02em]">Read slowly.</p>
           <p className="text-[44px] leading-tight">Heading one, 44</p>
@@ -228,21 +228,27 @@ export default function StyleguidePage() {
         <div className="grid gap-10 lg:grid-cols-[1fr_320px]">
           <div className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-4">
             {sampleListings.map((l, i) => (
-              <ListingCard key={l.id} listing={l} index={i} />
+              <ListingCard key={l.id} listing={l} locale="en" index={i} />
             ))}
           </div>
           <div className="h-fit border border-rule bg-surface p-5">
             <p className="eyebrow mb-4">Seller receives</p>
-            <PriceBreakdown amountMinor={90000} bps={700} currency="DZD" />
+            <PriceBreakdown
+              amountMinor={90000}
+              bps={700}
+              currency="DZD"
+              locale="en"
+              labels={{ buyerPays: 'Buyer pays', commission: 'Platform commission (7%)', youReceive: 'You receive' }}
+            />
           </div>
         </div>
       </Section>
 
       <Section title="Chat" note="Messages fade in the last quarter of their life, then disappear.">
         <div className="grid max-w-xl gap-4 border border-rule p-5">
-          <MessageLine author="Yacine B." body="Anyone reading Dib this week?" time="09:12" expiresIn="3h" mine={false} life={0.12} />
-          <MessageLine author="You" body="Halfway through The Big House. Slow start, worth it." time="11:40" expiresIn="14h" mine life={0.6} />
-          <MessageLine author="Amina Kaci" body="I have a spare copy if anyone wants to swap." time="12:02" expiresIn="23h" mine={false} />
+          <MessageLine author="Yacine B." body="Anyone reading Dib this week?" time="09:12" expiresIn="3h" expiresLabel="disappears in 3h" mine={false} life={0.12} />
+          <MessageLine author="You" body="Halfway through The Big House. Slow start, worth it." time="11:40" expiresIn="14h" expiresLabel="disappears in 14h" mine life={0.6} />
+          <MessageLine author="Amina Kaci" body="I have a spare copy if anyone wants to swap." time="12:02" expiresIn="23h" expiresLabel="disappears in 23h" mine={false} />
         </div>
       </Section>
 
@@ -251,8 +257,8 @@ export default function StyleguidePage() {
           <Monogram name="Amina" size="lg" />
           <Monogram name="Yacine" />
           <Monogram name="Lina" size="sm" />
-          <Rating value={4} />
-          <Rating value={2} />
+          <Rating value={4} label="4 out of 5" />
+          <Rating value={2} label="2 out of 5" />
         </div>
         <Rule label="Chapter two" />
         <Empty title="Your shelf is empty.">Add the books you own. Mark what you would swap or sell.</Empty>

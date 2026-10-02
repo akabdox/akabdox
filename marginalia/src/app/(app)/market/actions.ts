@@ -7,11 +7,13 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { chargilyEnabled, createCheckout } from '@/lib/payments/chargily'
 import { field, friendlyError, type ActionState } from '@/lib/form'
 import { siteUrl } from '@/lib/site'
+import { getDict } from '@/i18n/server'
 
 export async function buy(_: ActionState, form: FormData): Promise<ActionState> {
+  const t = await getDict()
   const supabase = await createClient()
   const { data, error } = await supabase.rpc('create_order', { p_listing: field(form, 'listing_id') })
-  if (error || !data) return { error: friendlyError(error) }
+  if (error || !data) return { error: friendlyError(error, t) }
   const order = data as { id: string; amount_minor: number }
 
   // Manual mode: the admin confirms the transfer from the dashboard.
@@ -36,16 +38,17 @@ export async function buy(_: ActionState, form: FormData): Promise<ActionState> 
     checkoutUrl = checkout.checkout_url
   } catch {
     await admin.rpc('release_order', { p_tx: order.id })
-    return { error: 'The payment page did not open. Nothing was charged. Try again.' }
+    return { error: t.market.checkoutFailed }
   }
   redirect(checkoutUrl)
 }
 
 export async function cancelOrder(_: ActionState, form: FormData): Promise<ActionState> {
+  const t = await getDict()
   const supabase = await createClient()
   const { error } = await supabase.rpc('cancel_my_order', { p_tx: field(form, 'id') })
-  if (error) return { error: friendlyError(error) }
+  if (error) return { error: friendlyError(error, t) }
   revalidatePath('/orders')
   revalidatePath('/market')
-  return { ok: 'Order cancelled. The book is back on the market.' }
+  return { ok: t.market.cancelled }
 }

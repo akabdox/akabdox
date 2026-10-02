@@ -11,14 +11,18 @@ import { requireViewer } from '@/lib/viewer'
 import { POST_SELECT } from '@/lib/queries'
 import type { BookRef, Post } from '@/lib/types'
 import { createPost } from './actions'
+import { getDict } from '@/i18n/server'
 
-export const metadata: Metadata = { title: 'Feed' }
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getDict()).feed.title }
+}
 
 const PAGE = 30
 
 export default async function FeedPage({ searchParams }: { searchParams: Promise<{ before?: string }> }) {
   const { before } = await searchParams
   const viewer = await requireViewer()
+  const t = await getDict()
   const supabase = await createClient()
 
   let query = supabase.from('posts').select(POST_SELECT).order('created_at', { ascending: false }).limit(PAGE)
@@ -34,7 +38,7 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
 
   return (
     <div className="mx-auto max-w-2xl">
-      <PageHeader eyebrow="Community" title="Feed" />
+      <PageHeader eyebrow={t.feed.eyebrow} title={t.feed.title} />
 
       <ActionForm action={createPost} className="composer border border-rule bg-surface p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -42,17 +46,17 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
             name="kind"
             defaultValue="thought"
             options={[
-              { value: 'thought', label: 'Thought' },
-              { value: 'review', label: 'Review' },
-              { value: 'idea', label: 'Idea' },
+              { value: 'thought', label: t.kinds.thought },
+              { value: 'review', label: t.kinds.review },
+              { value: 'idea', label: t.kinds.idea },
             ]}
           />
         </div>
-        <Textarea name="body" required maxLength={4000} rows={3} placeholder="What stayed with you?" aria-label="Post" />
+        <Textarea name="body" required maxLength={4000} rows={3} placeholder={t.feed.placeholder} aria-label={t.feed.postLabel} dir="auto" />
         <div className="grid gap-4 sm:grid-cols-[1fr_140px]">
-          <Field label="About a book">
+          <Field label={t.feed.aboutBook}>
             <Select name="book_id" defaultValue="">
-              <option value="">None</option>
+              <option value="">{t.feed.none}</option>
               {books.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.title}, {b.author}
@@ -60,24 +64,24 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
               ))}
             </Select>
           </Field>
-          <Field label="Rating" className="review-only">
+          <Field label={t.feed.rating} className="review-only">
             <Select name="rating" defaultValue="4">
               {[5, 4, 3, 2, 1].map((n) => (
                 <option key={n} value={n}>
-                  {n} of 5
+                  {t.feed.ratingOption(n)}
                 </option>
               ))}
             </Select>
           </Field>
         </div>
-        <SubmitButton className="justify-self-end" pendingLabel="Posting">
-          Post
+        <SubmitButton className="justify-self-end" pendingLabel={t.feed.posting}>
+          {t.feed.post}
         </SubmitButton>
       </ActionForm>
 
       <div className="mt-6">
         {list.length === 0 ? (
-          <Empty title="Quiet in here.">Be the first to say what you are reading.</Empty>
+          <Empty title={t.feed.emptyTitle}>{t.feed.emptyBody}</Empty>
         ) : (
           list.map((post, i) => <PostCard key={post.id} post={post} index={i} />)
         )}
@@ -88,7 +92,7 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
           href={`/feed?before=${encodeURIComponent(list[list.length - 1].created_at)}`}
           className="eyebrow mt-8 inline-block hover:text-ink"
         >
-          Older posts →
+          {t.more(t.feed.older)}
         </Link>
       ) : null}
     </div>

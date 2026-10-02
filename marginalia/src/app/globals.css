@@ -44,8 +44,8 @@
   --color-rule-strong: var(--rule-strong);
   --color-danger: var(--danger);
 
-  /* Adobe Fonts (futura-pt) or the system Futura when present, Jost otherwise. */
-  --font-sans: "futura-pt", Futura, var(--font-jost), "Century Gothic", ui-sans-serif, sans-serif;
+  /* Inter for Latin script, IBM Plex Sans Arabic for Arabic script. */
+  --font-sans: var(--font-inter), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
@@ -129,6 +129,33 @@
     animation-delay: 0ms !important;
     transition-duration: 1ms !important;
   }
+}
+
+/* Arabic: letter spacing breaks the joins between letters, and small sizes
+   lose their dots. Drop the tracking and lift the smallest labels. Latin
+   pieces marked lang="en" (the wordmark, the spines) keep their tracking. */
+[dir="rtl"] *:not(:lang(en)) {
+  letter-spacing: 0 !important;
+}
+
+[dir="rtl"] body {
+  line-height: 1.7;
+}
+
+[dir="rtl"] .eyebrow {
+  font-size: 12.5px;
+}
+
+/* Select chevron sits on the inline end in both directions. */
+.select-chevron {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%236b6b6b' stroke-width='1.3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 10px;
+  background-position: right 12px center;
+}
+
+[dir="rtl"] .select-chevron {
+  background-position: left 12px center;
 }
 
 /* Composer: rating and book fields only show for reviews. No JS. */

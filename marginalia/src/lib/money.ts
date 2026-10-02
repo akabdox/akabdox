@@ -1,7 +1,19 @@
-const grouping = new Intl.NumberFormat('en', { maximumFractionDigits: 2 })
+import { intlTag, type Locale } from '@/i18n/config'
 
-export function formatMoney(minor: number, currency: string): string {
-  return `${grouping.format(minor / 100)} ${currency}`
+// Currency label per language: DZD, DA, د.ج.
+const labels: Record<Locale, Record<string, string>> = {
+  ar: { DZD: 'د.ج' },
+  fr: { DZD: 'DA' },
+  en: { DZD: 'DZD' },
+}
+
+export function currencyLabel(currency: string, locale: Locale = 'en'): string {
+  return labels[locale][currency] ?? currency
+}
+
+export function formatMoney(minor: number, currency: string, locale: Locale = 'en'): string {
+  const amount = new Intl.NumberFormat(intlTag[locale], { maximumFractionDigits: 2 }).format(minor / 100)
+  return `${amount} ${currencyLabel(currency, locale)}`
 }
 
 // "1 250", "1,250.50", "1250" -> minor units. Returns null when unparseable.

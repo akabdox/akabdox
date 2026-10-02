@@ -43,48 +43,35 @@ do $$ begin
   assert (select role from public.profiles where username = 'founder') = 'admin', 'founder is admin';
 end $$;
 
-select pg_temp.expect_error(
-  $$ insert into auth.users (email, raw_user_meta_data) values ('x@example.com', '{"username": "nope"}') $$,
-  'invite');
-
--- one owner link seats three people, then closes
-select pg_temp.act_as(:'founder');
-select code as link from public.create_invite(3, 30) \gset
-reset role;
-
 do $$ begin
-  assert public.check_signup('BADCODE', 'someone', 'a@b.c') ilike '%expired or is full%', 'bad link reported';
-  assert public.check_signup('', 'someone', 'a@b.c') ilike '%invitation%', 'missing link reported';
-  assert public.check_signup((select code from public.invites limit 1), 'founder', 'a@b.c') ilike '%taken%', 'taken username reported';
-  assert public.check_signup((select code from public.invites limit 1), 'fresh_name', 'a@b.c') is null, 'valid signup passes';
+  assert public.check_signup('x') = 'username_invalid', 'short username reported';
+  assert public.check_signup('founder') = 'username_taken', 'taken username reported';
+  assert public.check_signup('fresh_name') is null, 'valid signup passes';
 end $$;
 
+-- sign up is open: no invite link, no cap
 insert into auth.users (id, email, raw_user_meta_data) values
-  (:'seller', 's@example.com', json_build_object('invite_code', lower(:'link'), 'username', 'seller')::jsonb),
-  (:'buyer',  'b@example.com', json_build_object('invite_code', :'link', 'username', 'buyer')::jsonb),
-  (:'other',  'o@example.com', json_build_object('invite_code', :'link', 'username', 'other')::jsonb);
-
-select pg_temp.expect_error(
-  format($$ insert into auth.users (email, raw_user_meta_data) values ('y@example.com', '{"invite_code": "%s", "username": "fourth"}') $$, :'link'),
-  'invite');
+  (:'seller', 's@example.com', '{"username": "seller"}'),
+  (:'buyer',  'b@example.com', '{"username": "buyer"}'),
+  (:'other',  'o@example.com', '{"username": "other"}');
 
 do $$ begin
   assert (select count(*) from public.profiles) = 4, 'four members';
-  assert (select uses from public.invites) = 3, 'link used three times';
-  assert public.check_signup((select code from public.invites limit 1), 'fresh_name', 'a@b.c') ilike '%full%', 'full link reported';
+  assert (select count(*) from public.profiles where role = 'admin') = 1, 'only the founder is admin';
+  assert (select onboarded_at from public.profiles where username = 'seller') is null, 'new member has not seen the guide';
 end $$;
 
--- only the owner creates or closes links
+-- onboarding flag is per member
 select pg_temp.act_as(:'seller');
-select pg_temp.expect_error($$ select public.create_invite() $$, 'only the owner');
-select pg_temp.expect_error(format($$ select public.close_invite('%s') $$, :'link'), 'only the owner');
-select pg_temp.act_as(:'founder');
-select code as link_2 from public.create_invite(5, 7) \gset
-select public.close_invite(:'link_2');
+select public.set_onboarded();
 reset role;
 do $$ begin
-  assert public.check_signup((select code from public.invites where max_uses = 5), 'fresh_name', 'a@b.c') ilike '%expired%', 'closed link refused';
+  assert (select onboarded_at from public.profiles where username = 'seller') is not null, 'guide closed';
+  assert (select onboarded_at from public.profiles where username = 'buyer') is null, 'other member untouched';
 end $$;
+select pg_temp.act_as(null);
+select pg_temp.expect_error($$ select public.set_onboarded() $$, 'permission denied');
+reset role;
 
 -- anon sees nothing
 select pg_temp.act_as(null);

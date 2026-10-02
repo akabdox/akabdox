@@ -4,11 +4,13 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { field, friendlyError, optionalField, type ActionState } from '@/lib/form'
+import { getDict } from '@/i18n/server'
 
 export async function createPost(_: ActionState, form: FormData): Promise<ActionState> {
+  const t = await getDict()
   const kind = field(form, 'kind') || 'thought'
   const body = field(form, 'body')
-  if (!body) return { error: 'Write something first.' }
+  if (!body) return { error: t.feed.writeFirst }
 
   const rating = kind === 'review' ? Number(field(form, 'rating')) || null : null
   const supabase = await createClient()
@@ -18,7 +20,7 @@ export async function createPost(_: ActionState, form: FormData): Promise<Action
     rating,
     book_id: optionalField(form, 'book_id'),
   })
-  if (error) return { error: friendlyError(error) }
+  if (error) return { error: friendlyError(error, t) }
   revalidatePath('/feed')
   return null
 }
@@ -31,12 +33,13 @@ export async function deletePost(form: FormData) {
 }
 
 export async function addComment(_: ActionState, form: FormData): Promise<ActionState> {
+  const t = await getDict()
   const postId = field(form, 'post_id')
   const body = field(form, 'body')
-  if (!body) return { error: 'Write a reply first.' }
+  if (!body) return { error: t.feed.replyFirst }
   const supabase = await createClient()
   const { error } = await supabase.from('comments').insert({ post_id: postId, body })
-  if (error) return { error: friendlyError(error) }
+  if (error) return { error: friendlyError(error, t) }
   revalidatePath(`/feed/${postId}`)
   return null
 }

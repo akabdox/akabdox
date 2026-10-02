@@ -6,7 +6,7 @@ Paused on 27 Sep 2026. The code for items 1 to 3 is written and committed, but c
 
 * Branch `claude/book-community-platform-xc3yp1`, folder `marginalia/`.
 * Passing: `npm test`, `npm run db:check`, `npm run typecheck`, `npm run build`.
-* A full run with two members passed against real Supabase Auth (GoTrue) and PostgREST: invite sign up, shelving, listing, purchase in manual payment mode, admin confirmation, ownership transfer, feed replies, chat rooms, direct messages.
+* A full run with two members passed against real Supabase Auth (GoTrue) and PostgREST: sign up, shelving, listing, purchase in manual payment mode, admin confirmation, ownership transfer, feed replies, chat rooms, direct messages.
 * That local stack and the browser test script were throwaway tools and are not in the repo. When resuming, use `npx supabase start` (needs Docker) or a hosted Supabase project.
 
 ## 1. Supabase Realtime for instant chat

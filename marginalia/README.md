@@ -1,6 +1,6 @@
 # Fahrasa
 
-A private community for 1,000 readers. Members post thoughts and reviews, keep a shelf of the books they own, sell or swap copies to each other, and talk in chat rooms that clear themselves.
+An open community for readers, in Arabic, French and English. Anyone can join free. Members post thoughts and reviews, keep a shelf of the books they own, sell or swap copies to each other, and talk in chat rooms that clear themselves.
 
 Working name. Rename it in `src/lib/site.ts`.
 
@@ -14,7 +14,8 @@ Live: https://taupe-sprite-d79dcc.netlify.app (Netlify builds this branch on eve
 | Styling | Tailwind CSS 4, CSS only motion | No animation library. One `rise` keyframe, staggered, disabled under reduced motion |
 | Data, auth, realtime | Supabase (Postgres, RLS, Realtime, pg_cron) | Business rules live in Postgres functions, so a buggy client cannot move money |
 | Payments | Chargily Pay v2 (CIB, Edahabia) or manual | Stripe does not onboard Algerian businesses. Manual mode covers CCP, BaridiMob and cash |
-| Type | Futura, falling back to Jost | Futura renders where installed or licensed; Jost is the open source revival |
+| Type | Inter, with IBM Plex Sans Arabic | Inter has no Arabic glyphs, so Arabic text falls through to Plex Arabic. Both load from Google Fonts via `next/font` |
+| Languages | Arabic (default, right to left), French, English | Cookie based, no URL prefix. Dictionaries in `src/i18n/dictionaries` |
 
 ## Design system
 
@@ -24,7 +25,7 @@ Status never relies on colour. It is carried by form: solid fill (for sale, paid
 
 See it live at `/styleguide`. Tokens are in `src/app/globals.css`; components in `src/components/ui`.
 
-**Futura licensing.** Futura is a commercial typeface. The stack is `futura-pt, Futura, Jost`. Apple devices ship Futura, so they render it. To serve Futura everywhere, add an Adobe Fonts web project with Futura PT (included with Creative Cloud) and put its `<link>` in `src/app/layout.tsx`. The `futura-pt` family name is already first in the stack.
+**Arabic.** The site is right to left when Arabic is chosen. Use logical Tailwind classes (`ms-`, `pe-`, `text-start`, `border-s`) instead of left and right ones. Letter spacing is removed for Arabic text because it breaks the joins; Latin pieces marked `lang="en"` keep it.
 
 ## Structure
 
@@ -35,7 +36,7 @@ supabase/
   seed.sql         local founder email
 src/
   app/
-    (auth)/        join (invite only), login
+    (auth)/        join (open), login
     (app)/         feed, u/[username] (shelf), market, orders, chat, settings, admin
     api/payments/  Chargily webhook
     styleguide/    design system page
@@ -48,15 +49,15 @@ src/
 
 | Table | Holds |
 | --- | --- |
-| `profiles` | Members. Created by a trigger on sign up, only with a valid invite |
-| `invites` | Owner-only invite links, each with a seat limit and an expiry |
+| `profiles` | Members. Created by a trigger on sign up. `onboarded_at` stays empty until the welcome guide is closed |
+| `invites` | Retired invite links, kept as history. Sign up is open |
 | `books` | Shared catalogue, deduplicated by ISBN or by title and author |
 | `shelf_items` | One row per copy a member owns: reading status, open to swap, condition |
 | `listings` | A copy on the market. One open listing per copy |
 | `transactions` | The ledger. Price, commission rate snapshot, commission, seller net, payout date |
 | `posts`, `comments` | Feed and discussion |
 | `rooms`, `room_members`, `messages` | Public rooms and direct messages, each with a time to live |
-| `settings` | Singleton: commission rate, currency, member cap, invite quota |
+| `settings` | Singleton: commission rate, currency, chat timing. The old member cap and invite quota columns are no longer used |
 
 "For sale" is not a shelf status. It is derived from an open listing, so the shelf and the market can never disagree. Reading status and swap availability are separate fields, because a book can be read and for swap at once.
 
@@ -80,23 +81,23 @@ Every message gets `expires_at` from its room: 24 hours in The Reading Room, 7 d
 
 ## Security
 
-Deny by default. The migrations revoke every table and function privilege Supabase grants automatically, then grant back only what each role needs, down to the column: a member can edit their shelf's reading status but not its owner, a listing's price but not its status. Anonymous visitors can call exactly one function, the invite check on the join page. Only the owner can create or close invite links. Money and ownership changes only happen inside `security definer` functions.
+Deny by default. The migrations revoke every table and function privilege Supabase grants automatically, then grant back only what each role needs, down to the column: a member can edit their shelf's reading status but not its owner, a listing's price but not its status. Anonymous visitors can call exactly one function, the username check on the join page. Money and ownership changes only happen inside `security definer` functions.
 
 ## Setup
 
 1. Create a Supabase project.
-2. Apply the migrations: `npx supabase link --project-ref <ref>` then `npx supabase db push`. Or paste the four files in `supabase/migrations` into the SQL editor, in order.
+2. Apply the migrations: `npx supabase link --project-ref <ref>` then `npx supabase db push`. Or paste `supabase/setup.sql` into the SQL editor. If you already ran an older setup, run only the newer files in `supabase/migrations`.
 3. In the SQL editor, set the founder: `update public.settings set founder_email = 'you@yourdomain.com';`
 4. Copy `.env.example` to `.env.local` and fill it in.
 5. `npm install && npm run dev`
-6. Open `/join` and sign up with the founder email; no link is needed for that one address. You become admin. Create invite links in Admin, choose how many seats each one has and how long it stays open, and share them.
+6. Open `/join` and sign up with the founder email. You become admin. Everyone else signs up at `/join` too and sees the welcome guide on first visit.
 
 For payments, add `CHARGILY_SECRET_KEY` and set the webhook URL in the Chargily dashboard to `https://<your domain>/api/payments/chargily`. Without a key the app runs in manual mode.
 
 ## Checks
 
 ```
-npm test          # commission math
+npm test          # commission math, language detection
 npm run db:check  # every migration + smoke test on a throwaway Postgres 16
 npm run typecheck
 npm run build

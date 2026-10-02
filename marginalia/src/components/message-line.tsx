@@ -7,6 +7,7 @@ export function MessageLine({
   body,
   time,
   expiresIn,
+  expiresLabel,
   mine,
   life = 1,
 }: {
@@ -14,6 +15,7 @@ export function MessageLine({
   body: string
   time: string
   expiresIn: string
+  expiresLabel: string
   mine: boolean
   life?: number
 }) {
@@ -23,9 +25,10 @@ export function MessageLine({
       <p className="flex gap-2 text-[11px] text-ink-3">
         {!mine ? <span className="font-medium text-ink-2">{author}</span> : null}
         <span>{time}</span>
-        <span aria-label={`disappears in ${expiresIn}`}>· {expiresIn}</span>
+        <span aria-label={expiresLabel}>· {expiresIn}</span>
       </p>
       <p
+        dir="auto"
         className={cn(
           'whitespace-pre-line rounded-[2px] px-3.5 py-2 text-[15px] leading-relaxed',
           mine ? 'bg-ink text-paper' : 'border border-rule bg-surface',

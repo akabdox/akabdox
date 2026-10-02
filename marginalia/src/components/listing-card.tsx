@@ -2,9 +2,10 @@ import type { CSSProperties } from 'react'
 import Link from 'next/link'
 import { BookCover } from './ui/book-cover'
 import { formatMoney } from '@/lib/money'
+import type { Locale } from '@/i18n/config'
 import type { ListingWithBook } from '@/lib/types'
 
-export function ListingCard({ listing, index = 0 }: { listing: ListingWithBook; index?: number }) {
+export function ListingCard({ listing, locale, index = 0 }: { listing: ListingWithBook; locale: Locale; index?: number }) {
   return (
     <Link
       href={`/market/${listing.id}`}
@@ -21,7 +22,7 @@ export function ListingCard({ listing, index = 0 }: { listing: ListingWithBook; 
       <div className="grid gap-0.5">
         <p className="line-clamp-1 text-[14px] font-medium">{listing.book.title}</p>
         <p className="line-clamp-1 text-[13px] text-ink-3">{listing.book.author}</p>
-        <p className="tabular mt-1 text-[14px] font-medium">{formatMoney(listing.price_minor, listing.currency)}</p>
+        <p className="tabular mt-1 text-[14px] font-medium">{formatMoney(listing.price_minor, listing.currency, locale)}</p>
       </div>
     </Link>
   )

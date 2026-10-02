@@ -7,11 +7,15 @@ import { Input } from '@/components/ui/field'
 import { createClient } from '@/lib/supabase/server'
 import { LISTING_SELECT } from '@/lib/queries'
 import type { ListingWithBook } from '@/lib/types'
+import { getDict, getI18n } from '@/i18n/server'
 
-export const metadata: Metadata = { title: 'Market' }
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getDict()).market.title }
+}
 
 export default async function MarketPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const { q } = await searchParams
+  const { locale, t } = await getI18n()
   // Keep search terms to characters that are safe inside a PostgREST filter.
   const term = (q ?? '').replace(/[^\p{L}\p{N}\s'-]/gu, '').trim().slice(0, 60)
   const supabase = await createClient()
@@ -29,25 +33,25 @@ export default async function MarketPage({ searchParams }: { searchParams: Promi
 
   return (
     <>
-      <PageHeader eyebrow="Peer to peer" title="Market">
-        Copies from members' shelves. Pay here, meet or ship, and the book moves to your shelf.
+      <PageHeader eyebrow={t.market.eyebrow} title={t.market.title}>
+        {t.market.intro}
       </PageHeader>
 
       <form className="mb-10 flex max-w-md gap-2" role="search">
-        <Input name="q" defaultValue={term} placeholder="Title or author" aria-label="Search the market" />
+        <Input name="q" defaultValue={term} placeholder={t.market.searchPlaceholder} aria-label={t.market.searchLabel} dir="auto" />
         <Button type="submit" variant="secondary">
-          Search
+          {t.market.search}
         </Button>
       </form>
 
       {listings.length === 0 ? (
-        <Empty title={term ? `Nothing matches “${term}”.` : 'The market is empty.'}>
-          List a copy from your shelf and it shows up here.
+        <Empty title={term ? t.market.noMatch(term) : t.market.empty}>
+          {t.market.emptyBody}
         </Empty>
       ) : (
         <div className="grid grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-3 lg:grid-cols-5">
           {listings.map((l, i) => (
-            <ListingCard key={l.id} listing={l} index={i} />
+            <ListingCard key={l.id} listing={l} locale={locale} index={i} />
           ))}
         </div>
       )}

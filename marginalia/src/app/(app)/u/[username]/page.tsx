@@ -16,18 +16,16 @@ import { SHELF_SELECT } from '@/lib/queries'
 import { formatDate } from '@/lib/time'
 import { cn } from '@/lib/cn'
 import type { Profile, Settings, ShelfItem } from '@/lib/types'
-import { addBook, listForSale, removeShelfItem, updateShelfItem, withdrawListing } from '../../shelf/actions'
+import { addBook, listForSale, lookupIsbn, removeShelfItem, updateShelfItem, withdrawListing } from '../../shelf/actions'
+import { IsbnField } from '@/components/isbn-field'
+import { formatRate } from '@/lib/commission'
+import { currencyLabel } from '@/lib/money'
+import { getI18n } from '@/i18n/server'
 import { openDirect } from '../../chat/actions'
 
 type Filter = 'all' | 'reading' | 'read' | 'swap' | 'sale'
 
-const filters: { key: Filter; label: string }[] = [
-  { key: 'all', label: 'All' },
-  { key: 'reading', label: 'Reading' },
-  { key: 'read', label: 'Read' },
-  { key: 'swap', label: 'Swap' },
-  { key: 'sale', label: 'For sale' },
-]
+const filters: Filter[] = ['all', 'reading', 'read', 'swap', 'sale']
 
 function isOpen(item: ShelfItem) {
   return item.listings.find((l) => l.status === 'active' || l.status === 'reserved')
@@ -54,6 +52,7 @@ export default async function ProfilePage({
 }) {
   const [{ username }, { show }] = await Promise.all([params, searchParams])
   const viewer = await requireViewer()
+  const { locale, t } = await getI18n()
   const supabase = await createClient()
 
   const { data: profileRow } = await supabase.from('profiles').select('*').eq('username', username.toLowerCase()).maybeSingle()
@@ -67,7 +66,7 @@ export default async function ProfilePage({
   ])
   const shelf = (shelfRows ?? []) as unknown as ShelfItem[]
   const settings = (settingsRow ?? { commission_bps: 700, currency: 'DZD' }) as Settings
-  const filter = (filters.some((f) => f.key === show) ? show : 'all') as Filter
+  const filter = (filters.includes(show as Filter) ? show : 'all') as Filter
   const visible = shelf.filter((i) => matches(i, filter))
 
   const counts = {
@@ -77,6 +76,32 @@ export default async function ProfilePage({
     sale: shelf.filter((i) => isOpen(i)).length,
   }
 
+  const readingOptions = (['unread', 'reading', 'read'] as const).map((r) => (
+    <option key={r} value={r}>
+      {t.reading[r]}
+    </option>
+  ))
+  const conditionOptions = [
+    <option key="" value="">
+      {t.shelf.notSet}
+    </option>,
+    ...(['new', 'fine', 'good', 'worn'] as const).map((c) => (
+      <option key={c} value={c}>
+        {t.conditions[c]}
+      </option>
+    )),
+  ]
+  const sellLabels = {
+    price: t.sell.price(currencyLabel(settings.currency, locale)),
+    note: t.sell.note,
+    notePlaceholder: t.sell.notePlaceholder,
+    submit: t.sell.submit,
+    pending: t.sell.pending,
+    buyerPays: t.sell.buyerPays,
+    commission: t.sell.commission(formatRate(settings.commission_bps)),
+    youReceive: t.sell.youReceive,
+  }
+
   return (
     <div className="grid gap-10">
       <header className="grid gap-6 sm:grid-cols-[auto_1fr_auto] sm:items-center">
@@ -84,23 +109,27 @@ export default async function ProfilePage({
         <div className="grid gap-1">
           <h1 className="flex flex-wrap items-center gap-3 text-[32px]">
             {profile.display_name}
-            {profile.role === 'admin' ? <Badge tone="outline">Founder</Badge> : null}
+            {profile.role === 'admin' ? <Badge tone="outline">{t.badges.founder}</Badge> : null}
           </h1>
           <p className="text-[14px] text-ink-3">
             @{profile.username}
-            {profile.city ? ` · ${profile.city}` : ''} · member since {formatDate(profile.created_at)}
+            {profile.city ? ` · ${profile.city}` : ''} · {t.shelf.memberSince(formatDate(profile.created_at, locale))}
           </p>
-          {profile.bio ? <p className="mt-2 max-w-lg text-ink-2">{profile.bio}</p> : null}
+          {profile.bio ? (
+            <p dir="auto" className="mt-2 max-w-lg text-ink-2">
+              {profile.bio}
+            </p>
+          ) : null}
         </div>
         {own ? (
           <Link href="/settings" className="eyebrow hover:text-ink">
-            Edit profile
+            {t.shelf.editProfile}
           </Link>
         ) : (
           <form action={openDirect}>
             <input type="hidden" name="user_id" value={profile.id} />
             <Button type="submit" variant="secondary">
-              Message
+              {t.shelf.message}
             </Button>
           </form>
         )}
@@ -109,10 +138,10 @@ export default async function ProfilePage({
       <dl className="tabular grid grid-cols-4 border-y border-rule py-5 text-center">
         {(
           [
-            ['Books', counts.books],
-            ['Read', counts.read],
-            ['Swap', counts.swap],
-            ['For sale', counts.sale],
+            [t.shelf.stats.books, counts.books],
+            [t.shelf.stats.read, counts.read],
+            [t.shelf.stats.swap, counts.swap],
+            [t.shelf.stats.sale, counts.sale],
           ] as const
         ).map(([label, n]) => (
           <div key={label} className="grid gap-1">
@@ -124,22 +153,22 @@ export default async function ProfilePage({
 
       <div className="grid gap-10 lg:grid-cols-[1fr_320px]">
         <section>
-          <nav className="flex flex-wrap gap-5 border-b border-rule pb-3" aria-label="Filter shelf">
+          <nav className="flex flex-wrap gap-5 border-b border-rule pb-3" aria-label={t.shelf.filterLabel}>
             {filters.map((f) => (
               <Link
-                key={f.key}
-                href={f.key === 'all' ? `/u/${profile.username}` : `/u/${profile.username}?show=${f.key}`}
-                className={cn('eyebrow hover:text-ink', filter === f.key && 'text-ink underline underline-offset-8')}
+                key={f}
+                href={f === 'all' ? `/u/${profile.username}` : `/u/${profile.username}?show=${f}`}
+                className={cn('eyebrow hover:text-ink', filter === f && 'text-ink underline underline-offset-8')}
               >
-                {f.label}
+                {t.shelf.filters[f]}
               </Link>
             ))}
           </nav>
 
           {visible.length === 0 ? (
             <div className="mt-6">
-              <Empty title={own ? 'Your shelf is empty.' : 'Nothing here yet.'}>
-                {own ? 'Add the books you own. Mark what you would swap or sell.' : null}
+              <Empty title={own ? t.shelf.emptyOwn : t.shelf.emptyOther}>
+                {own ? t.shelf.emptyOwnBody : null}
               </Empty>
             </div>
           ) : (
@@ -150,36 +179,30 @@ export default async function ProfilePage({
                   {own ? (
                     <details className="group mt-1">
                       <summary className="eyebrow cursor-pointer list-none hover:text-ink">
-                        <span className="group-open:hidden">Manage</span>
-                        <span className="hidden group-open:inline">Close</span>
+                        <span className="group-open:hidden">{t.shelf.manage}</span>
+                        <span className="hidden group-open:inline">{t.shelf.close}</span>
                       </summary>
-                      <div className="mt-4 grid gap-6 border-l border-rule pl-4">
+                      <div className="mt-4 grid gap-6 border-s border-rule ps-4">
                         <ActionForm action={updateShelfItem}>
                           <input type="hidden" name="id" value={item.id} />
                           <div className="grid gap-4 sm:grid-cols-2">
-                            <Field label="Status">
+                            <Field label={t.shelf.status}>
                               <Select name="reading_status" defaultValue={item.reading_status}>
-                                <option value="unread">Unread</option>
-                                <option value="reading">Reading</option>
-                                <option value="read">Read</option>
+                                {readingOptions}
                               </Select>
                             </Field>
-                            <Field label="Condition">
+                            <Field label={t.shelf.condition}>
                               <Select name="condition" defaultValue={item.condition ?? ''}>
-                                <option value="">Not set</option>
-                                <option value="new">New</option>
-                                <option value="fine">Fine</option>
-                                <option value="good">Good</option>
-                                <option value="worn">Worn</option>
+                                {conditionOptions}
                               </Select>
                             </Field>
                           </div>
-                          <Field label="Note">
-                            <Input name="note" defaultValue={item.note ?? ''} maxLength={500} />
+                          <Field label={t.shelf.note}>
+                            <Input name="note" defaultValue={item.note ?? ''} maxLength={500} dir="auto" />
                           </Field>
-                          <Checkbox name="open_to_swap" label="Open to swap" defaultChecked={item.open_to_swap} />
+                          <Checkbox name="open_to_swap" label={t.shelf.openToSwap} defaultChecked={item.open_to_swap} />
                           <SubmitButton size="sm" variant="secondary" className="justify-self-start">
-                            Save
+                            {t.shelf.save}
                           </SubmitButton>
                         </ActionForm>
 
@@ -188,21 +211,28 @@ export default async function ProfilePage({
                             <ActionForm action={withdrawListing}>
                               <input type="hidden" name="listing_id" value={listing.id} />
                               <SubmitButton size="sm" variant="danger" className="justify-self-start">
-                                Withdraw from market
+                                {t.shelf.withdraw}
                               </SubmitButton>
                             </ActionForm>
                           ) : (
-                            <p className="text-[13px] text-ink-3">A buyer is checking out. The copy is reserved.</p>
+                            <p className="text-[13px] text-ink-3">{t.shelf.reservedNote}</p>
                           )
                         ) : (
-                          <SellForm shelfItemId={item.id} bps={settings.commission_bps} currency={settings.currency} action={listForSale} />
+                          <SellForm
+                            shelfItemId={item.id}
+                            bps={settings.commission_bps}
+                            currency={settings.currency}
+                            locale={locale}
+                            labels={sellLabels}
+                            action={listForSale}
+                          />
                         )}
 
                         {!listing || listing.status === 'active' ? (
                           <ActionForm action={removeShelfItem}>
                             <input type="hidden" name="id" value={item.id} />
                             <SubmitButton size="sm" variant="ghost" className="justify-self-start text-danger">
-                              Remove from shelf
+                              {t.shelf.remove}
                             </SubmitButton>
                           </ActionForm>
                         ) : null}
@@ -217,48 +247,43 @@ export default async function ProfilePage({
 
         {own ? (
           <aside className="h-fit border border-rule bg-surface p-5 lg:sticky lg:top-24">
-            <p className="eyebrow mb-4">Add a book</p>
+            <p className="eyebrow mb-4">{t.shelf.addTitle}</p>
             <ActionForm action={addBook}>
-              <Field label="Title">
-                <Input name="title" required maxLength={300} />
+              <IsbnField
+                lookup={lookupIsbn}
+                labels={{ isbn: t.shelf.isbn, hint: t.shelf.isbnHint, lookup: t.shelf.lookup, lookingUp: t.shelf.lookingUp }}
+              />
+              <Field label={t.shelf.title}>
+                <Input name="title" required maxLength={300} dir="auto" />
               </Field>
-              <Field label="Author">
-                <Input name="author" required maxLength={200} />
+              <Field label={t.shelf.author}>
+                <Input name="author" required maxLength={200} dir="auto" />
               </Field>
-              <div className="grid grid-cols-[1fr_96px] gap-3">
-                <Field label="ISBN" hint="Pulls the cover">
-                  <Input name="isbn" inputMode="numeric" />
+              <div className="grid grid-cols-[96px_1fr] gap-3">
+                <Field label={t.shelf.year}>
+                  <Input name="year" inputMode="numeric" maxLength={4} dir="ltr" />
                 </Field>
-                <Field label="Year">
-                  <Input name="year" inputMode="numeric" maxLength={4} />
+                <Field label={t.shelf.format}>
+                  <Select name="format" defaultValue="physical">
+                    <option value="physical">{t.formats.physical}</option>
+                    <option value="digital">{t.formats.digital}</option>
+                  </Select>
                 </Field>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Status">
+                <Field label={t.shelf.status}>
                   <Select name="reading_status" defaultValue="unread">
-                    <option value="unread">Unread</option>
-                    <option value="reading">Reading</option>
-                    <option value="read">Read</option>
+                    {readingOptions}
                   </Select>
                 </Field>
-                <Field label="Format">
-                  <Select name="format" defaultValue="physical">
-                    <option value="physical">Physical</option>
-                    <option value="digital">Digital</option>
+                <Field label={t.shelf.condition}>
+                  <Select name="condition" defaultValue="">
+                    {conditionOptions}
                   </Select>
                 </Field>
               </div>
-              <Field label="Condition">
-                <Select name="condition" defaultValue="">
-                  <option value="">Not set</option>
-                  <option value="new">New</option>
-                  <option value="fine">Fine</option>
-                  <option value="good">Good</option>
-                  <option value="worn">Worn</option>
-                </Select>
-              </Field>
-              <Checkbox name="open_to_swap" label="Open to swap" />
-              <SubmitButton pendingLabel="Adding">Add to shelf</SubmitButton>
+              <Checkbox name="open_to_swap" label={t.shelf.openToSwap} />
+              <SubmitButton pendingLabel={t.shelf.adding}>{t.shelf.add}</SubmitButton>
             </ActionForm>
           </aside>
         ) : null}

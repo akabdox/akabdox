@@ -14,11 +14,13 @@ import { isUuid } from '@/lib/uuid'
 import type { Comment, Post } from '@/lib/types'
 import { POST_SELECT } from '@/lib/queries'
 import { addComment, deleteComment, deletePost } from '../actions'
+import { getI18n } from '@/i18n/server'
 
 export default async function PostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   if (!isUuid(id)) notFound()
   const viewer = await requireViewer()
+  const { locale, t } = await getI18n()
   const supabase = await createClient()
 
   const [{ data: post }, { data: comments }] = await Promise.all([
@@ -38,19 +40,19 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
   return (
     <div className="mx-auto max-w-2xl">
       <Link href="/feed" className="eyebrow hover:text-ink">
-        ← Feed
+        {t.back(t.nav.feed)}
       </Link>
       <PostCard post={p} full />
       {canDelete ? (
         <form action={deletePost} className="mt-3">
           <input type="hidden" name="id" value={p.id} />
           <Button type="submit" variant="ghost" className="text-[11px]">
-            Delete post
+            {t.feed.deletePost}
           </Button>
         </form>
       ) : null}
 
-      <Rule label={`${replies.length} ${replies.length === 1 ? 'reply' : 'replies'}`} className="mt-10 mb-2" />
+      <Rule label={t.feed.replies(replies.length)} className="mt-10 mb-2" />
 
       {replies.map((c) => (
         <div key={c.id} className="grid grid-cols-[auto_1fr] gap-3 border-b border-rule py-5">
@@ -60,27 +62,27 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
               <Link href={`/u/${c.author.username}`} className="font-medium hover:underline">
                 {c.author.display_name}
               </Link>
-              <span className="text-ink-3">{timeAgo(c.created_at)}</span>
+              <span className="text-ink-3">{timeAgo(c.created_at, locale)}</span>
               {c.author_id === viewer.id || viewer.role === 'admin' ? (
-                <form action={deleteComment} className="ml-auto">
+                <form action={deleteComment} className="ms-auto">
                   <input type="hidden" name="id" value={c.id} />
                   <input type="hidden" name="post_id" value={p.id} />
                   <button type="submit" className="eyebrow hover:text-danger">
-                    Delete
+                    {t.feed.delete}
                   </button>
                 </form>
               ) : null}
             </p>
-            <p className="reading whitespace-pre-line">{c.body}</p>
+            <p dir="auto" className="reading whitespace-pre-line">{c.body}</p>
           </div>
         </div>
       ))}
 
       <ActionForm action={addComment} className="mt-6">
         <input type="hidden" name="post_id" value={p.id} />
-        <Textarea name="body" required maxLength={2000} rows={3} placeholder="Add to the conversation" aria-label="Reply" />
-        <SubmitButton className="justify-self-end" pendingLabel="Replying">
-          Reply
+        <Textarea name="body" required maxLength={2000} rows={3} placeholder={t.feed.replyPlaceholder} aria-label={t.feed.reply} dir="auto" />
+        <SubmitButton className="justify-self-end" pendingLabel={t.feed.replying}>
+          {t.feed.reply}
         </SubmitButton>
       </ActionForm>
     </div>
