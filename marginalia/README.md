@@ -25,6 +25,10 @@ Status never relies on colour. It is carried by form: solid fill (for sale, paid
 
 See it live at `/styleguide`. Tokens are in `src/app/globals.css`; components in `src/components/ui`.
 
+**Light and dark.** The device setting decides until a member presses the half filled circle in the header; the choice is saved in the `theme` cookie and set on `<html>` before the page paints.
+
+**Landing page.** A funnel in five sections: problem, how it works, inside, the name, questions, then a last call to join. Live counts (readers, books, copies for sale) appear only from 30 members, through `public_stats()`.
+
 **Arabic.** The site is right to left when Arabic is chosen. Use logical Tailwind classes (`ms-`, `pe-`, `text-start`, `border-s`) instead of left and right ones. Letter spacing is removed for Arabic text because it breaks the joins; Latin pieces marked `lang="en"` keep it.
 
 ## Structure

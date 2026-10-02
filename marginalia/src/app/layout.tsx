@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { cookies } from 'next/headers'
 import type { Metadata, Viewport } from 'next'
 import { IBM_Plex_Sans_Arabic, Inter } from 'next/font/google'
 import { site } from '@/lib/site'
@@ -39,8 +40,15 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const { locale } = await getI18n()
+  const theme = (await cookies()).get('theme')?.value
   return (
-    <html lang={locale} dir={dirOf(locale)} className={`${inter.variable} ${arabic.variable}`}>
+    <html
+      lang={locale}
+      dir={dirOf(locale)}
+      data-theme={theme === 'light' || theme === 'dark' ? theme : undefined}
+      className={`${inter.variable} ${arabic.variable}`}
+      suppressHydrationWarning
+    >
       <body>{children}</body>
     </html>
   )

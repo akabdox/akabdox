@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { NavLink } from './nav-link'
+import { ThemeToggle } from './theme-toggle'
 import { Monogram } from './ui/monogram'
 import { site } from '@/lib/site'
 import type { Profile } from '@/lib/types'
@@ -38,6 +39,7 @@ export async function Nav({ viewer }: { viewer: Profile }) {
             <NavLink href="/orders" className="hidden md:inline">
               {t.nav.orders}
             </NavLink>
+            <ThemeToggle labels={{ light: t.theme.light, dark: t.theme.dark }} />
             <Link href="/settings" aria-label={t.nav.settings}>
               <Monogram name={viewer.display_name} size="sm" />
             </Link>

@@ -76,6 +76,7 @@ reset role;
 -- anon sees nothing
 select pg_temp.act_as(null);
 select pg_temp.expect_error($$ select * from public.profiles $$, 'permission denied');
+select pg_temp.check((public.public_stats() ->> 'members')::int = 4, 'anon reads the member count');
 reset role;
 
 -- ------------------------------------------------------------------- shelf
