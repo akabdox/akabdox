@@ -7,7 +7,7 @@ import { getDict } from '@/i18n/server'
 import { signIn } from '../actions'
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { title: (await getDict()).auth.signIn }
+  return { title: (await getDict()).auth.signIn, alternates: { canonical: '/login' } }
 }
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {

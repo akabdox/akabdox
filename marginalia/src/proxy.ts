@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PUBLIC_PATHS = ['/', '/login', '/join', '/styleguide']
+const PUBLIC_PATHS = ['/', '/login', '/join', '/styleguide', '/robots.txt', '/sitemap.xml']
 
 // Refreshes the Supabase session cookie on every request and keeps
 // non-members out of everything except the front door.

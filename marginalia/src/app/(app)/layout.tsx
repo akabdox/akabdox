@@ -1,7 +1,11 @@
 import type { ReactNode } from 'react'
+import type { Metadata } from 'next'
 import { Nav } from '@/components/nav'
 import { Welcome } from '@/components/welcome'
 import { requireViewer } from '@/lib/viewer'
+
+// Member pages are private: keep them out of search results.
+export const metadata: Metadata = { robots: { index: false, follow: false } }
 
 export default async function MemberLayout({ children }: { children: ReactNode }) {
   const viewer = await requireViewer()

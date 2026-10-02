@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { cookies } from 'next/headers'
 import type { Metadata, Viewport } from 'next'
 import { IBM_Plex_Sans_Arabic, Inter } from 'next/font/google'
-import { site } from '@/lib/site'
+import { site, siteUrl } from '@/lib/site'
 import { dirOf } from '@/i18n/config'
 import { getI18n } from '@/i18n/server'
 import './globals.css'
@@ -23,11 +23,22 @@ const arabic = IBM_Plex_Sans_Arabic({
 })
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getI18n()
+  const { locale, t } = await getI18n()
+  const title = `${site.name} · ${t.meta.tagline}`
   return {
-    title: { default: site.name, template: `%s · ${site.name}` },
-    description: t.meta.tagline,
-    robots: { index: false, follow: false },
+    metadataBase: new URL(siteUrl()),
+    title: { default: title, template: `%s · ${site.name}` },
+    description: t.landing.body,
+    applicationName: site.name,
+    keywords: ['Fahrasa', 'فهرسة', 'books', 'كتب', 'livres', 'Algeria', 'الجزائر', 'Algérie', 'book swap', 'تبادل الكتب', 'bouquiniste', 'readers'],
+    openGraph: {
+      type: 'website',
+      siteName: site.name,
+      title,
+      description: t.landing.body,
+      locale: { ar: 'ar_DZ', fr: 'fr_DZ', en: 'en_US' }[locale],
+    },
+    twitter: { card: 'summary_large_image', title, description: t.landing.body },
   }
 }
 

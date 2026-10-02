@@ -7,7 +7,7 @@ import { getDict } from '@/i18n/server'
 import { signUp } from '../actions'
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { title: (await getDict()).auth.joinLink }
+  return { title: (await getDict()).auth.joinLink, alternates: { canonical: '/join' } }
 }
 
 // Open to anyone. The founder email becomes admin on sign up.

@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react'
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
@@ -106,6 +107,8 @@ async function publicStats(): Promise<{ members: number; books: number; listings
   if (error || !data) return null
   return data as { members: number; books: number; listings: number }
 }
+
+export const metadata: Metadata = { alternates: { canonical: '/' } }
 
 export default async function Home() {
   if (await getViewer()) redirect('/feed')

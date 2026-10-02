@@ -17,7 +17,7 @@ import { MessageLine } from '@/components/message-line'
 import { site } from '@/lib/site'
 import type { ListingWithBook, Post, ShelfItem } from '@/lib/types'
 
-export const metadata: Metadata = { title: 'Design system' }
+export const metadata: Metadata = { title: 'Design system', robots: { index: false, follow: false } }
 
 const colors = [
   ['paper', '--paper', 'Background'],
