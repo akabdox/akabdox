@@ -1,8 +1,8 @@
 import type { CSSProperties, ReactNode } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { ButtonLink } from '@/components/ui/button'
-import { BookCover } from '@/components/ui/book-cover'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ListingCard } from '@/components/listing-card'
 import { MessageLine } from '@/components/message-line'
@@ -58,6 +58,11 @@ const samples: Record<Locale, { title: string; author: string }[]> = {
     { title: 'The Stranger', author: 'Albert Camus' },
   ],
 }
+
+// The hero's front cover, named in the reader's language.
+const heroTitle: Record<Locale, string> = { ar: 'مقدمة ابن خلدون', fr: 'La Muqaddima', en: 'The Muqaddimah' }
+
+const coverStyle = 'h-auto w-full rounded-[1px] shadow-[0_1px_0_rgba(0,0,0,0.06),0_22px_40px_-20px_rgba(0,0,0,0.55)]'
 
 const stagger = (i: number) => ({ '--i': i }) as CSSProperties
 
@@ -201,22 +206,25 @@ export default async function Home() {
             ) : null}
           </div>
 
-          {/* A book, its price, a line of talk: the product in one glance. */}
-          <div aria-hidden className="relative mx-auto h-[380px] w-full max-w-[400px] sm:h-[470px]">
-            <div className="animate-rise absolute inset-x-0 top-0 flex justify-center" style={stagger(3)}>
-              <BookCover title={books[0].title} author={books[0].author} size="lg" className="w-44 sm:w-56" />
+          {/* Two real covers, a price, a line of talk: the product in one glance. */}
+          <div aria-hidden className="relative mx-auto h-[420px] w-full max-w-[400px] sm:h-[470px]">
+            <div className="animate-rise absolute start-4 top-0 w-36 sm:start-6 sm:w-44" style={stagger(3)}>
+              <Image src="/covers/shurut-al-nahda.webp" alt="" width={800} height={1175} sizes="(min-width: 640px) 176px, 144px" priority className={coverStyle} />
             </div>
-            <div className="animate-rise absolute end-0 top-12 w-[190px] sm:top-16 sm:w-[210px]" style={stagger(5)}>
+            <div className="animate-rise absolute end-4 top-14 w-44 sm:end-6 sm:w-52" style={stagger(4)}>
+              <Image src="/covers/muqaddimat-ibn-khaldun.webp" alt="" width={640} height={816} sizes="(min-width: 640px) 208px, 176px" priority className={coverStyle} />
+            </div>
+            <div className="animate-rise absolute start-0 top-[228px] w-[170px] sm:top-[280px] sm:w-[200px]" style={stagger(5)}>
               <div className="grid gap-1.5 border border-rule bg-surface px-3.5 py-3 shadow-[0_18px_40px_-24px_rgba(0,0,0,0.45)]">
                 <span className="text-[11px] font-medium text-ink-3">{L.inside.messages[2][0]}</span>
                 <span className="text-[14px] leading-snug">{L.inside.messages[2][1]}</span>
               </div>
             </div>
             <div
-              className="animate-rise absolute start-0 bottom-0 w-[190px] border border-rule bg-surface p-4 shadow-[0_18px_40px_-24px_rgba(0,0,0,0.45)] sm:w-[210px]"
+              className="animate-rise absolute end-0 bottom-0 w-[180px] border border-rule bg-surface p-4 shadow-[0_18px_40px_-24px_rgba(0,0,0,0.45)] sm:w-[210px]"
               style={stagger(6)}
             >
-              <p className="mb-1 truncate text-[13px] font-medium">{books[0].title}</p>
+              <p className="mb-1 truncate text-[13px] font-medium">{heroTitle[locale]}</p>
               <p className="tabular mb-3 text-[22px] font-medium">{formatMoney(90000, 'DZD', locale)}</p>
               <span className="inline-flex h-6 items-center rounded-full border border-dashed border-ink-2 px-2.5 text-[10px] font-medium uppercase tracking-[0.14em] text-ink-2">
                 {t.badges.swap}
