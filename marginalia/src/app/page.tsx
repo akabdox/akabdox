@@ -38,24 +38,22 @@ const spines = [
 ] as const
 
 // Sample books in the reader's own script.
-const samples: Record<Locale, { title: string; author: string }[]> = {
+// The three real covers in public/covers, named in the reader's language.
+const samples: Record<Locale, { title: string; author: string; cover: string; year: number }[]> = {
   ar: [
-    { title: 'نجمة', author: 'كاتب ياسين' },
-    { title: 'الدار الكبيرة', author: 'محمد ديب' },
-    { title: 'موسم الهجرة إلى الشمال', author: 'الطيب صالح' },
-    { title: 'الغريب', author: 'ألبير كامو' },
+    { title: 'الإخوة كارامازوف', author: 'دوستويفسكي', cover: '/covers/brothers-karamazov.webp', year: 1880 },
+    { title: 'مقدمة ابن خلدون', author: 'ابن خلدون', cover: '/covers/muqaddimat-ibn-khaldun.webp', year: 1377 },
+    { title: 'شروط النهضة', author: 'مالك بن نبي', cover: '/covers/shurut-al-nahda.webp', year: 1949 },
   ],
   fr: [
-    { title: 'Nedjma', author: 'Kateb Yacine' },
-    { title: 'La Grande Maison', author: 'Mohammed Dib' },
-    { title: 'Saison de la migration vers le nord', author: 'Tayeb Salih' },
-    { title: 'L’Étranger', author: 'Albert Camus' },
+    { title: 'Les Frères Karamazov', author: 'Fiodor Dostoïevski', cover: '/covers/brothers-karamazov.webp', year: 1880 },
+    { title: 'La Muqaddima', author: 'Ibn Khaldoun', cover: '/covers/muqaddimat-ibn-khaldun.webp', year: 1377 },
+    { title: 'Les Conditions de la renaissance', author: 'Malek Bennabi', cover: '/covers/shurut-al-nahda.webp', year: 1949 },
   ],
   en: [
-    { title: 'Nedjma', author: 'Kateb Yacine' },
-    { title: 'The Big House', author: 'Mohammed Dib' },
-    { title: 'Season of Migration to the North', author: 'Tayeb Salih' },
-    { title: 'The Stranger', author: 'Albert Camus' },
+    { title: 'The Brothers Karamazov', author: 'Fyodor Dostoevsky', cover: '/covers/brothers-karamazov.webp', year: 1880 },
+    { title: 'The Muqaddimah', author: 'Ibn Khaldun', cover: '/covers/muqaddimat-ibn-khaldun.webp', year: 1377 },
+    { title: 'The Conditions of Renaissance', author: 'Malek Bennabi', cover: '/covers/shurut-al-nahda.webp', year: 1949 },
   ],
 }
 
@@ -126,7 +124,7 @@ export default async function Home() {
     condition: 'good',
     note: L.inside.shelfNote,
     created_at: now,
-    book: { id: 'b0', isbn: null, published_year: 1956, cover_url: null, ...books[0] },
+    book: { id: 'b0', isbn: null, published_year: books[0].year, cover_url: books[0].cover, title: books[0].title, author: books[0].author },
     listings: [{ id: 'l0', status: 'active', price_minor: 90000, currency: 'DZD' }],
   }
   const listings: ListingWithBook[] = books.slice(1, 3).map((b, i) => ({
@@ -141,7 +139,7 @@ export default async function Home() {
     description: null,
     status: 'active',
     created_at: now,
-    book: { id: `b${i + 1}`, isbn: null, published_year: null, cover_url: null, ...b },
+    book: { id: `b${i + 1}`, isbn: null, published_year: null, cover_url: b.cover, title: b.title, author: b.author },
     seller: { username: 'yacine', display_name: 'Yacine' },
   }))
   const breakdownLabels = { buyerPays: t.sell.buyerPays, commission: t.sell.commission(formatRate(700)), youReceive: t.sell.youReceive }
