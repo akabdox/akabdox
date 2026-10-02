@@ -9,7 +9,8 @@ export default async function MemberLayout({ children }: { children: ReactNode }
     <>
       <Nav viewer={viewer} />
       <main className="mx-auto w-full max-w-5xl px-4 pt-10 pb-28 sm:px-6 md:pb-16">{children}</main>
-      {viewer.onboarded_at ? null : <Welcome viewer={viewer} />}
+      {/* Strictly null: before the onboarding migration the column is missing, and the guide stays hidden. */}
+      {viewer.onboarded_at === null ? <Welcome viewer={viewer} /> : null}
     </>
   )
 }
