@@ -1,4 +1,4 @@
-# Qurtuba
+# Fahrasa
 
 A private community for 1,000 readers. Members post thoughts and reviews, keep a shelf of the books they own, sell or swap copies to each other, and talk in chat rooms that clear themselves.
 
