@@ -1,5 +1,5 @@
 export const site = {
-  name: 'Marginalia',
+  name: 'Qurtuba',
   tagline: 'A private library of a thousand readers.',
 }
 

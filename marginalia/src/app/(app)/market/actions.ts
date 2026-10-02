@@ -26,7 +26,7 @@ export async function buy(_: ActionState, form: FormData): Promise<ActionState> 
       successUrl: `${origin}/orders?placed=${order.id}`,
       failureUrl: `${origin}/orders`,
       webhookUrl: `${origin}/api/payments/chargily`,
-      description: `Marginalia order ${order.id.slice(0, 8)}`,
+      description: `Qurtuba order ${order.id.slice(0, 8)}`,
     })
     const { error: saveError } = await admin
       .from('transactions')
