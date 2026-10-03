@@ -4,7 +4,7 @@ An open community for readers, in Arabic, French and English. Anyone can join fr
 
 Working name. Rename it in `src/lib/site.ts`.
 
-Live: https://taupe-sprite-d79dcc.netlify.app (Netlify builds this branch on every push).
+Live: https://fahrasa.vercel.app (Vercel project `fahrasa`, root directory `marginalia`). The old Netlify site is frozen and no longer updated.
 
 ## Stack
 
