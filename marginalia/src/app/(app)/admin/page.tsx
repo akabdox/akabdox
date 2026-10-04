@@ -3,7 +3,7 @@ import { PageHeader } from '@/components/page-header'
 import { TransactionBadge } from '@/components/status'
 import { ActionForm } from '@/components/ui/action-form'
 import { Field, Input } from '@/components/ui/field'
-import { Rule } from '@/components/ui/rule'
+import { Icon } from '@/components/ui/icon'
 import { SubmitButton } from '@/components/ui/submit-button'
 import { createClient } from '@/lib/supabase/server'
 import { requireAdmin } from '@/lib/viewer'
@@ -66,21 +66,24 @@ export default async function AdminPage() {
   ]
 
   return (
-    <div className="grid gap-12">
+    <div className="grid gap-6">
       <PageHeader eyebrow={t.admin.eyebrow} title={t.admin.title} />
 
-      <dl className="tabular grid grid-cols-2 gap-px border border-rule bg-rule sm:grid-cols-4">
-        {stats.map(([label, value]) => (
-          <div key={label} className="grid gap-2 bg-paper p-5">
-            <dt className="eyebrow">{label}</dt>
-            <dd className="text-[24px] font-medium">{value}</dd>
+      <dl className="tabular grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {stats.map(([label, value], i) => (
+          <div key={label} className={i === 0 ? 'grid gap-2 rounded-md bg-primary-container p-5 text-on-primary-container' : 'grid gap-2 rounded-md bg-surface-low p-5'}>
+            <dt className={i === 0 ? 'type-label-lg' : 'type-label-lg text-on-surface-variant'}>{label}</dt>
+            <dd className="type-headline-sm">{value}</dd>
           </div>
         ))}
       </dl>
 
-      <section className="grid max-w-sm gap-4">
-        <Rule label={t.admin.commission} />
-        <ActionForm action={setCommission}>
+      <section className="grid gap-5 rounded-xl bg-surface-low p-5 sm:p-8">
+        <h2 className="flex items-center gap-2 type-title-lg">
+          <Icon name="payments" className="text-primary" />
+          {t.admin.commission}
+        </h2>
+        <ActionForm action={setCommission} className="max-w-sm">
           <Field label={t.admin.rateLabel} hint={t.admin.rateHint}>
             <Input name="percent" type="number" step="0.25" min="0" max="20" defaultValue={s.commission_bps / 100} />
           </Field>
@@ -90,14 +93,17 @@ export default async function AdminPage() {
         </ActionForm>
       </section>
 
-      <section className="grid gap-2">
-        <Rule label={t.admin.ledger} />
-        <div className="overflow-x-auto">
-          <table className="tabular w-full min-w-[760px] text-start text-[13px]">
+      <section className="grid gap-4 rounded-xl bg-surface-low p-5 sm:p-8">
+        <h2 className="flex items-center gap-2 type-title-lg">
+          <Icon name="receipt_long" className="text-primary" />
+          {t.admin.ledger}
+        </h2>
+        <div className="-mx-5 overflow-x-auto px-5 sm:-mx-8 sm:px-8">
+          <table className="tabular w-full min-w-[760px] text-start type-body-md">
             <thead>
-              <tr className="border-b border-rule">
+              <tr className="border-b border-outline-variant">
                 {t.admin.columns.map((h, i) => (
-                  <th key={i} className="eyebrow py-3 pe-4 text-start font-medium">
+                  <th key={i} className="py-3 pe-4 text-start type-label-lg text-on-surface-variant">
                     {h}
                   </th>
                 ))}
@@ -105,8 +111,8 @@ export default async function AdminPage() {
             </thead>
             <tbody>
               {txs.map((tx) => (
-                <tr key={tx.id} className="border-b border-rule align-top">
-                  <td className="py-3 pe-4 text-ink-3">{formatDate(tx.created_at, locale)}</td>
+                <tr key={tx.id} className="border-b border-outline-variant align-top">
+                  <td className="py-3 pe-4 text-on-surface-variant">{formatDate(tx.created_at, locale)}</td>
                   <td className="py-3 pe-4 font-medium">{tx.listing.book.title}</td>
                   <td className="py-3 pe-4">
                     <span dir="ltr">
@@ -120,7 +126,7 @@ export default async function AdminPage() {
                     <div className="grid justify-items-start gap-1">
                       <TransactionBadge status={tx.status} />
                       {tx.status === 'paid' ? (
-                        <span className="text-[11px] text-ink-3">{tx.paid_out_at ? t.admin.paidOut : t.admin.payoutOwed}</span>
+                        <span className="type-label-sm text-on-surface-variant">{tx.paid_out_at ? t.admin.paidOut : t.admin.payoutOwed}</span>
                       ) : null}
                     </div>
                   </td>
@@ -140,7 +146,7 @@ export default async function AdminPage() {
               ))}
             </tbody>
           </table>
-          {txs.length === 0 ? <p className="py-10 text-center text-ink-3">{t.admin.noTransactions}</p> : null}
+          {txs.length === 0 ? <p className="py-10 text-center text-on-surface-variant">{t.admin.noTransactions}</p> : null}
         </div>
       </section>
     </div>

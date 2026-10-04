@@ -7,7 +7,7 @@ import { cn } from '@/lib/cn'
 export async function LanguageSwitcher({ className }: { className?: string }) {
   const { locale, t } = await getI18n()
   return (
-    <form action={setLocale} className={cn('flex items-center gap-4', className)} aria-label={t.language}>
+    <form action={setLocale} className={cn('flex items-center gap-1', className)} aria-label={t.language}>
       {locales.map((l) => (
         <button
           key={l}
@@ -16,7 +16,7 @@ export async function LanguageSwitcher({ className }: { className?: string }) {
           value={l}
           lang={l}
           aria-pressed={l === locale}
-          className={cn('text-[13px] transition-colors', l === locale ? 'text-ink underline underline-offset-4' : 'text-ink-3 hover:text-ink')}
+          className={cn('state-layer h-8 rounded-sm px-3 type-label-lg', l === locale ? 'bg-secondary-container text-on-secondary-container' : 'text-on-surface-variant')}
         >
           {localeNames[l]}
         </button>

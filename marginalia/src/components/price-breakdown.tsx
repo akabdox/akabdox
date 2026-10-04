@@ -21,13 +21,13 @@ export function PriceBreakdown({
 }) {
   const b = breakdown(amountMinor, bps)
   return (
-    <dl className="tabular grid grid-cols-[1fr_auto] gap-x-6 gap-y-2 text-[14px]">
-      <dt className="text-ink-2">{labels.buyerPays}</dt>
+    <dl className="tabular grid grid-cols-[1fr_auto] gap-x-6 gap-y-2.5 rounded-md bg-surface-container p-4 type-body-md">
+      <dt className="text-on-surface-variant">{labels.buyerPays}</dt>
       <dd className="text-end">{formatMoney(b.amount, currency, locale)}</dd>
-      <dt className="text-ink-2">{labels.commission}</dt>
-      <dd className="text-end text-ink-2">− {formatMoney(b.commission, currency, locale)}</dd>
-      <dt className="border-t border-rule pt-2 font-medium">{labels.youReceive}</dt>
-      <dd className="border-t border-rule pt-2 text-end font-medium">{formatMoney(b.sellerNet, currency, locale)}</dd>
+      <dt className="text-on-surface-variant">{labels.commission}</dt>
+      <dd className="text-end text-on-surface-variant">−{formatMoney(b.commission, currency, locale)}</dd>
+      <dt className="border-t border-outline-variant pt-2.5 type-title-sm">{labels.youReceive}</dt>
+      <dd className="border-t border-outline-variant pt-2.5 text-end type-title-sm text-primary">{formatMoney(b.sellerNet, currency, locale)}</dd>
     </dl>
   )
 }

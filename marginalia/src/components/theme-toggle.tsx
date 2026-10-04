@@ -1,6 +1,7 @@
 'use client'
 
 import { useSyncExternalStore } from 'react'
+import { Icon } from './ui/icon'
 import { cn } from '@/lib/cn'
 
 type Theme = 'light' | 'dark'
@@ -39,12 +40,9 @@ export function ThemeToggle({ labels, className }: { labels: { light: string; da
       onClick={flip}
       aria-label={next === 'dark' ? labels.dark : labels.light}
       title={next === 'dark' ? labels.dark : labels.light}
-      className={cn('grid size-8 place-items-center rounded-full text-ink-2 transition-colors hover:text-ink', className)}
+      className={cn('state-layer grid size-10 place-items-center rounded-full text-on-surface-variant', className)}
     >
-      <svg viewBox="0 0 20 20" className="size-[18px]" aria-hidden>
-        <circle cx="10" cy="10" r="7.25" fill="none" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M10 2.75a7.25 7.25 0 0 1 0 14.5z" fill="currentColor" />
-      </svg>
+      <Icon name={next === 'dark' ? 'dark_mode' : 'light_mode'} />
     </button>
   )
 }

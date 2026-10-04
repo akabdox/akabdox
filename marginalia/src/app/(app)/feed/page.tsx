@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { ButtonLink } from '@/components/ui/button'
 import { PostCard } from '@/components/post-card'
 import { PageHeader } from '@/components/page-header'
 import { ActionForm } from '@/components/ui/action-form'
@@ -40,8 +40,8 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
     <div className="mx-auto max-w-2xl">
       <PageHeader eyebrow={t.feed.eyebrow} title={t.feed.title} />
 
-      <ActionForm action={createPost} className="composer border border-rule bg-surface p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      <ActionForm action={createPost} className="composer animate-rise scroll-mt-24 rounded-xl bg-surface-low p-4 sm:p-6">
+        <div id="compose" className="flex flex-wrap items-center justify-between gap-3">
           <Segmented
             name="kind"
             defaultValue="thought"
@@ -74,12 +74,12 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
             </Select>
           </Field>
         </div>
-        <SubmitButton className="justify-self-end" pendingLabel={t.feed.posting}>
+        <SubmitButton className="justify-self-end" icon="send" pendingLabel={t.feed.posting}>
           {t.feed.post}
         </SubmitButton>
       </ActionForm>
 
-      <div className="mt-6">
+      <div className="mt-6 grid gap-3">
         {list.length === 0 ? (
           <Empty title={t.feed.emptyTitle}>{t.feed.emptyBody}</Empty>
         ) : (
@@ -88,12 +88,9 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
       </div>
 
       {list.length === PAGE ? (
-        <Link
-          href={`/feed?before=${encodeURIComponent(list[list.length - 1].created_at)}`}
-          className="eyebrow mt-8 inline-block hover:text-ink"
-        >
-          {t.more(t.feed.older)}
-        </Link>
+        <ButtonLink href={`/feed?before=${encodeURIComponent(list[list.length - 1].created_at)}`} variant="secondary" iconEnd="arrow_forward" className="mt-8">
+          {t.feed.older}
+        </ButtonLink>
       ) : null}
     </div>
   )

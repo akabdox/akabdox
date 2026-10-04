@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { BackLink } from '@/components/back-link'
 import { PriceBreakdown } from '@/components/price-breakdown'
 import { ListingBadge } from '@/components/status'
 import { ActionForm } from '@/components/ui/action-form'
 import { BookCover } from '@/components/ui/book-cover'
 import { Button } from '@/components/ui/button'
+import { Icon } from '@/components/ui/icon'
 import { SubmitButton } from '@/components/ui/submit-button'
 import { createClient } from '@/lib/supabase/server'
 import { requireViewer } from '@/lib/viewer'
@@ -41,50 +43,52 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
   const bps = settings?.commission_bps ?? 700
 
   return (
-    <div className="grid gap-10">
-      <Link href="/market" className="eyebrow hover:text-ink">
-        {t.back(t.nav.market)}
-      </Link>
+    <div className="grid gap-6">
+      <BackLink href="/market">{t.nav.market}</BackLink>
 
-      <div className="grid gap-10 md:grid-cols-[auto_1fr]">
-        <BookCover title={listing.book.title} author={listing.book.author} coverUrl={listing.book.cover_url} size="lg" className="w-56" />
+      <div className="grid gap-8 md:grid-cols-[auto_1fr] md:gap-12">
+        <div className="animate-rise grid place-items-center rounded-xl bg-surface-container p-8 sm:p-12 md:self-start">
+          <BookCover title={listing.book.title} author={listing.book.author} coverUrl={listing.book.cover_url} size="lg" className="w-44 sm:w-56" />
+        </div>
 
-        <div className="grid content-start gap-6">
-          <div className="grid gap-2">
+        <div className="animate-rise grid content-start gap-6 [--i:1]">
+          <div className="grid gap-3">
             <ListingBadge status={listing.status} />
-            <h1 className="text-[36px]">{listing.book.title}</h1>
-            <p className="text-[16px] text-ink-2">
+            <h1 dir="auto" className="type-display-sm">
+              {listing.book.title}
+            </h1>
+            <p dir="auto" className="type-body-lg text-on-surface-variant">
               {listing.book.author}
               {listing.book.published_year ? `, ${listing.book.published_year}` : ''}
             </p>
           </div>
 
-          <p className="tabular text-[28px] font-medium">{formatMoney(listing.price_minor, listing.currency, locale)}</p>
+          <p className="tabular type-headline-lg text-primary">{formatMoney(listing.price_minor, listing.currency, locale)}</p>
 
-          <dl className="grid max-w-sm grid-cols-[120px_1fr] gap-y-2 text-[14px]">
-            <dt className="eyebrow self-center">{t.market.seller}</dt>
+          <dl className="grid max-w-md grid-cols-[110px_1fr] gap-y-3 rounded-md bg-surface-low p-5 type-body-lg">
+            <dt className="self-center type-label-lg text-on-surface-variant">{t.market.seller}</dt>
             <dd>
               <Link href={`/u/${listing.seller.username}`} className="hover:underline">
                 {listing.seller.display_name}
               </Link>
             </dd>
-            <dt className="eyebrow self-center">{t.market.format}</dt>
+            <dt className="self-center type-label-lg text-on-surface-variant">{t.market.format}</dt>
             <dd>{t.formats[listing.format]}</dd>
             {listing.condition ? (
               <>
-                <dt className="eyebrow self-center">{t.market.condition}</dt>
+                <dt className="self-center type-label-lg text-on-surface-variant">{t.market.condition}</dt>
                 <dd>{t.conditions[listing.condition]}</dd>
               </>
             ) : null}
-            <dt className="eyebrow self-center">{t.market.listed}</dt>
+            <dt className="self-center type-label-lg text-on-surface-variant">{t.market.listed}</dt>
             <dd>{formatDate(listing.created_at, locale)}</dd>
           </dl>
 
           {listing.description ? <p dir="auto" className="reading max-w-lg whitespace-pre-line">{listing.description}</p> : null}
 
           {own ? (
-            <div className="max-w-sm border border-rule bg-surface p-5">
-              <p className="eyebrow mb-4">{t.market.yourListing}</p>
+            <div className="grid max-w-md gap-3">
+              <p className="type-title-md">{t.market.yourListing}</p>
               {paymentsEnabled ? (
                 <PriceBreakdown
                   amountMinor={listing.price_minor}
@@ -94,7 +98,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
                   labels={{ buyerPays: t.sell.buyerPays, commission: t.sell.commission(formatRate(bps)), youReceive: t.sell.youReceive }}
                 />
               ) : (
-                <p className="text-[14px] text-ink-2">{t.market.soldHint}</p>
+                <p className="type-body-md text-on-surface-variant">{t.market.soldHint}</p>
               )}
             </div>
           ) : listing.status === 'active' ? (
@@ -103,20 +107,27 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
                 {paymentsEnabled ? (
                   <ActionForm action={buy}>
                     <input type="hidden" name="listing_id" value={listing.id} />
-                    <SubmitButton pendingLabel={t.market.reserving}>{t.market.buy}</SubmitButton>
+                    <SubmitButton pendingLabel={t.market.reserving} size="lg" icon="payments">
+                      {t.market.buy}
+                    </SubmitButton>
                   </ActionForm>
                 ) : null}
                 <form action={openDirect}>
                   <input type="hidden" name="user_id" value={listing.seller_id} />
-                  <Button type="submit" variant={paymentsEnabled ? 'secondary' : 'primary'}>
+                  <Button type="submit" size="lg" icon="chat" variant={paymentsEnabled ? 'secondary' : 'primary'}>
                     {t.market.messageSeller}
                   </Button>
                 </form>
               </div>
-              {paymentsEnabled ? null : <p className="text-[13px] text-ink-3">{t.market.contactNote}</p>}
+              {paymentsEnabled ? null : (
+                <p className="flex items-start gap-2 type-body-md text-on-surface-variant">
+                  <Icon name="info" size={18} className="mt-px text-primary" />
+                  {t.market.contactNote}
+                </p>
+              )}
             </div>
           ) : (
-            <p className="text-ink-3">{t.market.unavailable}</p>
+            <p className="type-body-lg text-on-surface-variant">{t.market.unavailable}</p>
           )}
         </div>
       </div>

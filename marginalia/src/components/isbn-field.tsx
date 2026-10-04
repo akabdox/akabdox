@@ -48,7 +48,7 @@ export function IsbnField({
           {pending ? labels.lookingUp : labels.lookup}
         </Button>
       </div>
-      <span className="text-[13px] text-ink-3" role={message ? 'status' : undefined}>
+      <span className="type-body-md text-on-surface-variant" role={message ? 'status' : undefined}>
         {message ?? labels.hint}
       </span>
     </div>

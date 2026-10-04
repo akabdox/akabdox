@@ -16,8 +16,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <>
       <div className="grid gap-2">
-        <h1 className="text-[32px]">{t.auth.loginTitle}</h1>
-        <p className="text-ink-2">{t.auth.loginBody}</p>
+        <h1 className="type-headline-lg">{t.auth.loginTitle}</h1>
+        <p className="type-body-lg text-on-surface-variant">{t.auth.loginBody}</p>
       </div>
       <ActionForm action={signIn}>
         <input type="hidden" name="next" value={next ?? '/feed'} />
@@ -27,11 +27,13 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <Field label={t.auth.password}>
           <Input name="password" type="password" autoComplete="current-password" required dir="ltr" />
         </Field>
-        <SubmitButton pendingLabel={t.auth.signingIn}>{t.auth.signIn}</SubmitButton>
+        <SubmitButton pendingLabel={t.auth.signingIn} className="mt-2 w-full">
+          {t.auth.signIn}
+        </SubmitButton>
       </ActionForm>
-      <p className="text-[14px] text-ink-3">
+      <p className="type-body-md text-on-surface-variant">
         {t.auth.noAccount}{' '}
-        <Link href="/join" className="text-ink underline underline-offset-4">
+        <Link href="/join" className="font-medium text-primary underline underline-offset-4">
           {t.auth.joinLink}
         </Link>
       </p>

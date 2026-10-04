@@ -1,15 +1,18 @@
 import { cn } from '@/lib/cn'
 
 const sizes = {
-  sm: 'w-12 text-[6px] p-1.5',
-  md: 'w-28 text-[9px] p-2.5',
-  lg: 'w-44 text-[13px] p-4',
+  sm: 'w-12 p-1.5 text-[6px]',
+  md: 'w-24 p-2.5 text-[9px] sm:w-28',
+  lg: 'w-44 p-4 text-[13px]',
 }
 
+// Bookcloth jackets drawn from the scheme's tonal roles.
 const styles = [
-  'bg-ink text-paper',
-  'bg-ink-2 text-paper',
-  'bg-surface text-ink border border-ink',
+  'bg-primary text-on-primary',
+  'bg-secondary-container text-on-secondary-container',
+  'bg-tertiary text-on-tertiary',
+  'bg-primary-container text-on-primary-container',
+  'bg-inverse-surface text-inverse-on-surface',
 ]
 
 function pick(seed: string): string {
@@ -34,25 +37,13 @@ export function BookCover({
   className?: string
 }) {
   return (
-    <div
-      className={cn(
-        'relative aspect-[2/3] shrink-0 overflow-hidden rounded-[1px] shadow-[0_1px_0_rgba(0,0,0,0.06),0_8px_20px_-12px_rgba(0,0,0,0.45)]',
-        sizes[size],
-        pick(title + author),
-        className,
-      )}
-    >
-      <div className="flex h-full flex-col justify-between">
-        <span className="line-clamp-5 font-medium uppercase leading-[1.15] tracking-[0.08em]">{title}</span>
-        <span className="border-t border-current/40 pt-1 uppercase tracking-[0.12em] opacity-80 line-clamp-2">{author}</span>
+    <div className={cn('relative aspect-[2/3] shrink-0 overflow-hidden rounded-r-sm rounded-l-[3px] shadow-e2', sizes[size], pick(title + author), className)}>
+      <span aria-hidden className="absolute inset-y-0 left-0 w-[6%] bg-black/15" />
+      <div className="relative flex h-full flex-col justify-between pl-[6%]">
+        <span className="line-clamp-5 font-[family-name:var(--font-brand)] text-[1.35em] leading-[1.1]">{title}</span>
+        <span className="line-clamp-2 border-t border-current/30 pt-1 uppercase tracking-[0.1em] opacity-80">{author}</span>
       </div>
-      {coverUrl ? (
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url("${coverUrl}")` }}
-        />
-      ) : null}
+      {coverUrl ? <div aria-hidden className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url("${coverUrl}")` }} /> : null}
     </div>
   )
 }

@@ -19,12 +19,12 @@ export function ActionForm({
     <form action={formAction} className={cn('grid gap-4', className)}>
       {children}
       {state?.error ? (
-        <p role="alert" className="text-[13px] text-danger">
+        <p role="alert" className="type-body-md text-error">
           {state.error}
         </p>
       ) : null}
       {state?.ok ? (
-        <p role="status" className="text-[13px] text-ink-2">
+        <p role="status" className="type-body-md text-primary">
           {state.ok}
         </p>
       ) : null}

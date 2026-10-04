@@ -16,8 +16,8 @@ export default async function JoinPage() {
   return (
     <>
       <div className="grid gap-2">
-        <h1 className="text-[32px]">{t.auth.joinTitle}</h1>
-        <p className="text-ink-2">{t.auth.joinBody}</p>
+        <h1 className="type-headline-lg">{t.auth.joinTitle}</h1>
+        <p className="type-body-lg text-on-surface-variant">{t.auth.joinBody}</p>
       </div>
       <ActionForm action={signUp}>
         <Field label={t.auth.username} hint={t.auth.usernameHint}>
@@ -32,11 +32,13 @@ export default async function JoinPage() {
         <Field label={t.auth.password}>
           <Input name="password" type="password" required minLength={8} autoComplete="new-password" dir="ltr" />
         </Field>
-        <SubmitButton pendingLabel={t.auth.joining}>{t.auth.join}</SubmitButton>
+        <SubmitButton pendingLabel={t.auth.joining} className="mt-2 w-full">
+          {t.auth.join}
+        </SubmitButton>
       </ActionForm>
-      <p className="text-[14px] text-ink-3">
+      <p className="type-body-md text-on-surface-variant">
         {t.auth.haveAccount}{' '}
-        <Link href="/login" className="text-ink underline underline-offset-4">
+        <Link href="/login" className="font-medium text-primary underline underline-offset-4">
           {t.auth.signInLink}
         </Link>
       </p>

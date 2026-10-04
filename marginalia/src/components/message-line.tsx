@@ -21,17 +21,17 @@ export function MessageLine({
 }) {
   const opacity = life > 0.25 ? 1 : 0.35 + 0.65 * (life / 0.25)
   return (
-    <div className={cn('grid max-w-[85%] gap-1', mine ? 'justify-self-end justify-items-end' : 'justify-items-start')} style={{ opacity }}>
-      <p className="flex gap-2 text-[11px] text-ink-3">
-        {!mine ? <span className="font-medium text-ink-2">{author}</span> : null}
+    <div className={cn('grid max-w-[85%] gap-1 sm:max-w-[70%]', mine ? 'justify-self-end justify-items-end' : 'justify-items-start')} style={{ opacity }}>
+      <p className="flex gap-2 px-1 type-label-sm text-on-surface-variant">
+        {!mine ? <span className="text-on-surface">{author}</span> : null}
         <span>{time}</span>
         <span aria-label={expiresLabel}>· {expiresIn}</span>
       </p>
       <p
         dir="auto"
         className={cn(
-          'whitespace-pre-line rounded-[2px] px-3.5 py-2 text-[15px] leading-relaxed',
-          mine ? 'bg-ink text-paper' : 'border border-rule bg-surface',
+          'rounded-[20px] px-4 py-2.5 type-body-lg whitespace-pre-line',
+          mine ? 'rounded-ee-xs bg-primary text-on-primary' : 'rounded-es-xs bg-surface-high text-on-surface',
         )}
       >
         {body}

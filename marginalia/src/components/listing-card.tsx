@@ -9,7 +9,7 @@ export function ListingCard({ listing, locale, index = 0 }: { listing: ListingWi
   return (
     <Link
       href={`/market/${listing.id}`}
-      className="animate-rise group grid gap-3"
+      className="animate-rise group grid content-start gap-3 rounded-md p-2 transition-colors duration-200 hover:bg-surface-low"
       style={{ '--i': index } as CSSProperties}
     >
       <BookCover
@@ -17,12 +17,16 @@ export function ListingCard({ listing, locale, index = 0 }: { listing: ListingWi
         author={listing.book.author}
         coverUrl={listing.book.cover_url}
         size="lg"
-        className="w-full transition-transform duration-300 group-hover:-translate-y-1"
+        className="w-full transition-[transform,box-shadow] duration-300 ease-[var(--ease-emphasized)] group-hover:-translate-y-1.5 group-hover:shadow-e3"
       />
-      <div className="grid gap-0.5">
-        <p className="line-clamp-1 text-[14px] font-medium">{listing.book.title}</p>
-        <p className="line-clamp-1 text-[13px] text-ink-3">{listing.book.author}</p>
-        <p className="tabular mt-1 text-[14px] font-medium">{formatMoney(listing.price_minor, listing.currency, locale)}</p>
+      <div className="grid gap-0.5 px-1">
+        <p dir="auto" className="line-clamp-1 type-title-sm">
+          {listing.book.title}
+        </p>
+        <p dir="auto" className="line-clamp-1 type-body-sm text-on-surface-variant">
+          {listing.book.author}
+        </p>
+        <p className="tabular mt-1.5 type-title-md text-primary">{formatMoney(listing.price_minor, listing.currency, locale)}</p>
       </div>
     </Link>
   )

@@ -3,9 +3,9 @@ import Link from 'next/link'
 import { PageHeader } from '@/components/page-header'
 import { TransactionBadge } from '@/components/status'
 import { ActionForm } from '@/components/ui/action-form'
-import { ButtonLink } from '@/components/ui/button'
+import { ButtonLink, buttonClass } from '@/components/ui/button'
 import { Empty } from '@/components/ui/empty'
-import { Rule } from '@/components/ui/rule'
+import { Icon } from '@/components/ui/icon'
 import { SubmitButton } from '@/components/ui/submit-button'
 import { createClient } from '@/lib/supabase/server'
 import { requireViewer } from '@/lib/viewer'
@@ -43,26 +43,26 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
       <PageHeader eyebrow={t.orders.eyebrow} title={t.orders.title} />
 
       {placed ? (
-        <p role="status" className="mb-8 border border-ink px-4 py-3 text-[14px]">
+        <p role="status" className="mb-8 flex items-start gap-3 rounded-md bg-primary-container px-4 py-3 type-body-lg text-on-primary-container">
+          <Icon name="check_circle" filled className="mt-px" />
           {t.orders.placed}
         </p>
       ) : null}
 
-      <Rule label={t.orders.purchases} className="mb-2" />
+      <h2 className="mb-3 type-title-md text-on-surface-variant">{t.orders.purchases}</h2>
       {purchases.length === 0 ? (
-        <div className="my-6">
-          <Empty title={t.orders.noPurchases}>
-            <ButtonLink href="/market" variant="ghost">
-              {t.more(t.orders.browse)}
-            </ButtonLink>
-          </Empty>
-        </div>
+        <Empty icon="receipt_long" title={t.orders.noPurchases}>
+          <ButtonLink href="/market" variant="ghost" iconEnd="arrow_forward" className="mt-1">
+            {t.orders.browse}
+          </ButtonLink>
+        </Empty>
       ) : (
-        purchases.map((tx) => (
-          <article key={tx.id} className="grid gap-3 border-b border-rule py-5 sm:grid-cols-[1fr_auto] sm:items-start">
+        <div className="grid gap-3">
+        {purchases.map((tx) => (
+          <article key={tx.id} className="grid gap-4 rounded-md bg-surface-low p-5 sm:grid-cols-[1fr_auto] sm:items-start">
             <div className="grid gap-1">
-              <p className="font-medium">{tx.listing.book.title}</p>
-              <p className="text-[13px] text-ink-3">
+              <p dir="auto" className="type-title-md">{tx.listing.book.title}</p>
+              <p className="type-body-md text-on-surface-variant">
                 {t.orders.from}{' '}
                 <Link href={`/u/${tx.seller.username}`} className="hover:underline">
                   {tx.seller.display_name}
@@ -70,22 +70,25 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
                 · {formatDate(tx.created_at, locale)} · {t.orders.ref} <span dir="ltr">{tx.id.slice(0, 8).toUpperCase()}</span>
               </p>
               {tx.status === 'pending' && tx.provider === 'manual' ? (
-                <p className="mt-2 max-w-md text-[13px] text-ink-2">{manualInstructions}</p>
+                <p className="mt-3 flex max-w-md items-start gap-2 rounded-sm bg-surface-container p-3 type-body-md text-on-surface-variant">
+                  <Icon name="info" size={18} className="mt-px text-primary" />
+                  {manualInstructions}
+                </p>
               ) : null}
             </div>
             <div className="grid justify-items-start gap-2 sm:justify-items-end">
-              <p className="tabular font-medium">{money(tx.amount_minor, tx.currency)}</p>
+              <p className="tabular type-title-lg">{money(tx.amount_minor, tx.currency)}</p>
               <TransactionBadge status={tx.status} />
               {tx.status === 'pending' ? (
                 <div className="flex gap-2">
                   {tx.checkout_url ? (
-                    <a href={tx.checkout_url} className="eyebrow text-ink hover:underline">
+                    <a href={tx.checkout_url} className={buttonClass('primary', 'sm')}>
                       {t.orders.payNow}
                     </a>
                   ) : null}
                   <ActionForm action={cancelOrder}>
                     <input type="hidden" name="id" value={tx.id} />
-                    <SubmitButton size="sm" variant="ghost" className="text-[10.5px]">
+                    <SubmitButton size="sm" variant="ghost">
                       {t.orders.cancel}
                     </SubmitButton>
                   </ActionForm>
@@ -93,37 +96,40 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
               ) : null}
             </div>
           </article>
-        ))
+        ))}
+        </div>
       )}
 
-      <Rule label={t.orders.sales} className="mt-12 mb-2" />
+      <h2 className="mt-10 mb-3 type-title-md text-on-surface-variant">{t.orders.sales}</h2>
       {sales.length === 0 ? (
-        <div className="my-6">
-          <Empty title={t.orders.noSales}>{t.orders.noSalesBody}</Empty>
-        </div>
+        <Empty icon="sell" title={t.orders.noSales}>
+          {t.orders.noSalesBody}
+        </Empty>
       ) : (
-        sales.map((tx) => (
-          <article key={tx.id} className="grid gap-3 border-b border-rule py-5 sm:grid-cols-[1fr_auto]">
+        <div className="grid gap-3">
+        {sales.map((tx) => (
+          <article key={tx.id} className="grid gap-4 rounded-md bg-surface-low p-5 sm:grid-cols-[1fr_auto]">
             <div className="grid gap-1">
-              <p className="font-medium">{tx.listing.book.title}</p>
-              <p className="text-[13px] text-ink-3">
+              <p dir="auto" className="type-title-md">{tx.listing.book.title}</p>
+              <p className="type-body-md text-on-surface-variant">
                 {t.orders.to(tx.buyer.display_name)} · {formatDate(tx.created_at, locale)}
               </p>
             </div>
             <div className="grid justify-items-start gap-2 sm:justify-items-end">
-              <p className="tabular text-[13px] text-ink-3">
+              <p className="tabular type-body-md text-on-surface-variant">
                 {money(tx.amount_minor, tx.currency)} − {money(tx.commission_minor, tx.currency)} {t.orders.commission}
               </p>
-              <p className="tabular font-medium">{t.orders.toYou(money(tx.seller_net_minor, tx.currency))}</p>
+              <p className="tabular type-title-lg text-primary">{t.orders.toYou(money(tx.seller_net_minor, tx.currency))}</p>
               <TransactionBadge status={tx.status} />
               {tx.status === 'paid' ? (
-                <p className="text-[12px] text-ink-3">
+                <p className="type-body-sm text-on-surface-variant">
                   {tx.paid_out_at ? t.orders.paidOut(formatDate(tx.paid_out_at, locale)) : t.orders.payoutPending}
                 </p>
               ) : null}
             </div>
           </article>
-        ))
+        ))}
+        </div>
       )}
     </div>
   )

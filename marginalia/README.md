@@ -11,21 +11,24 @@ Live: https://fahrasa.vercel.app (Vercel project `fahrasa`, root directory `marg
 | Layer | Choice | Why |
 | --- | --- | --- |
 | App | Next.js 16 (App Router), React 19, TypeScript | Server components keep the client bundle small; server actions replace an API layer |
-| Styling | Tailwind CSS 4, CSS only motion | No animation library. One `rise` keyframe, staggered, disabled under reduced motion |
+| Styling | Tailwind CSS 4, Material 3 tokens | Colour roles, type scale, shape, elevation and state layers from M3, as CSS variables and Tailwind utilities |
+| Motion | Motion (motion.dev) | Nav indicator, page enter, hero, scroll reveals, accordions, chat bubbles. M3 easing tokens, honours reduced motion |
 | Data, auth, realtime | Supabase (Postgres, RLS, Realtime, pg_cron) | Business rules live in Postgres functions, so a buggy client cannot move money |
 | Payments | Chargily Pay v2 (CIB, Edahabia) or manual | Stripe does not onboard Algerian businesses. Manual mode covers CCP, BaridiMob and cash |
-| Type | Inter, with IBM Plex Sans Arabic | Inter has no Arabic glyphs, so Arabic text falls through to Plex Arabic. Both load from Google Fonts via `next/font` |
+| Type | Fraunces and Roboto Flex, with IBM Plex Sans Arabic | M3 brand face for display and headline, plain face for the rest. Neither has Arabic glyphs, so Arabic falls through to Plex Arabic |
 | Languages | Arabic (default, right to left), French, English | Cookie based, no URL prefix. Dictionaries in `src/i18n/dictionaries` |
 
 ## Design system
 
-Two values: ink `#1c1c1c` on paper `#f2f2f2`. Dark mode swaps them. Everything else is a grey derived from those two, plus one red reserved for errors.
+Material 3. Colour roles are a tonal spot scheme generated from one seed, bookcloth green `#35614F`, with `material-color-utilities`. Dark mode is the same seed's dark scheme.
 
-Status never relies on colour. It is carried by form: solid fill (for sale, paid), outline (reading, reserved), dashed outline (open to swap), grey tint (read, closed). It survives greyscale printing and colour blindness.
+Status is carried by form as well as colour: solid fill (for sale, paid), outline (reading, reserved), dashed outline (open to swap), tonal tint (read, closed). It survives greyscale printing and colour blindness.
 
-See it live at `/styleguide`. Tokens are in `src/app/globals.css`; components in `src/components/ui`.
+Navigation follows M3 window classes: a navigation bar under 768px, a navigation rail with a FAB from 768px up. The rail sits on the inline start, so it moves to the right in Arabic.
 
-**Light and dark.** The device setting decides until a member presses the half filled circle in the header; the choice is saved in the `theme` cookie and set on `<html>` before the page paints.
+See it live at `/styleguide`. Tokens are in `src/app/globals.css`, motion tokens in `src/lib/motion.ts`, components in `src/components/ui`. Icons are Material Symbols Rounded, subset in `src/app/layout.tsx`: add a name to that sorted list before using it. Arrows that point the reading way take the `flip-rtl` class.
+
+**Light and dark.** The device setting decides until a member presses the theme button in the header; the choice is saved in the `theme` cookie and set on `<html>` before the page paints.
 
 **Landing page.** A funnel in five sections: problem, how it works, inside, the name, questions, then a last call to join. Live counts (readers, books, copies for sale) appear only from 30 members, through `public_stats()`.
 

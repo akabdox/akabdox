@@ -2,33 +2,60 @@ import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { BookCover } from '@/components/ui/book-cover'
-import { Button } from '@/components/ui/button'
+import { Button, IconButton } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import { Empty } from '@/components/ui/empty'
 import { Checkbox, Field, Input, Segmented, Select, Textarea } from '@/components/ui/field'
 import { Monogram } from '@/components/ui/monogram'
 import { Rating } from '@/components/ui/rating'
-import { Rule } from '@/components/ui/rule'
 import { ListingBadge, ReadingBadge, SaleBadge, SwapBadge, TransactionBadge } from '@/components/status'
 import { PriceBreakdown } from '@/components/price-breakdown'
 import { PostCard } from '@/components/post-card'
 import { ShelfCard } from '@/components/shelf-card'
 import { ListingCard } from '@/components/listing-card'
 import { MessageLine } from '@/components/message-line'
-import { site } from '@/lib/site'
+import { Wordmark } from '@/components/wordmark'
 import type { ListingWithBook, Post, ShelfItem } from '@/lib/types'
 
 export const metadata: Metadata = { title: 'Design system', robots: { index: false, follow: false } }
 
-const colors = [
-  ['paper', '--paper', 'Background'],
-  ['surface', '--surface', 'Cards, inputs'],
-  ['sunken', '--sunken', 'Muted fills'],
-  ['ink', '--ink', 'Text, primary'],
-  ['ink-2', '--ink-2', 'Secondary text'],
-  ['ink-3', '--ink-3', 'Meta, labels'],
-  ['rule', '--rule', 'Hairlines'],
-  ['rule-strong', '--rule-strong', 'Hover borders'],
-  ['danger', '--danger', 'Errors only'],
+const roles = [
+  ['primary', 'on-primary', 'Primary', 'Filled buttons, prices, active states'],
+  ['primary-container', 'on-primary-container', 'Primary container', 'FAB, highlight cards'],
+  ['secondary-container', 'on-secondary-container', 'Secondary container', 'Tonal buttons, nav indicator, chips'],
+  ['tertiary-container', 'on-tertiary-container', 'Tertiary container', 'Chat, contrast accents'],
+  ['error-container', 'on-error-container', 'Error container', 'Refunds due, failures'],
+  ['inverse-surface', 'inverse-on-surface', 'Inverse surface', 'Number band, snackbars'],
+] as const
+
+const surfaces = [
+  ['surface', 'Surface'],
+  ['surface-container-low', 'Container low'],
+  ['surface-container', 'Container'],
+  ['surface-container-high', 'Container high'],
+  ['surface-container-highest', 'Container highest'],
+] as const
+
+const typeScale = [
+  ['type-display-lg', 'Display large', 'Read slowly.'],
+  ['type-display-md', 'Display medium', 'A thousand readers'],
+  ['type-headline-lg', 'Headline large', 'Season of Migration'],
+  ['type-headline-sm', 'Headline small', 'Keep a shelf of what you own'],
+  ['type-title-lg', 'Title large', 'The Stranger, Albert Camus'],
+  ['type-title-md', 'Title medium', 'Listed by Yacine B.'],
+  ['type-body-lg', 'Body large', 'Pencil notes in chapter two, the spine is cracked but every page is there.'],
+  ['type-body-md', 'Body medium', 'Rooms clear on a timer. Direct messages fade after a week.'],
+  ['type-label-lg', 'Label large', 'Claim your seat'],
+  ['type-label-md', 'Label medium', 'Open to swap'],
+] as const
+
+const shapes = [
+  ['rounded-xs', 'Extra small, 4'],
+  ['rounded-sm', 'Small, 8'],
+  ['rounded-md', 'Medium, 12'],
+  ['rounded-lg', 'Large, 16'],
+  ['rounded-xl', 'Extra large, 28'],
+  ['rounded-full', 'Full'],
 ] as const
 
 const books = [
@@ -85,10 +112,10 @@ const sampleListings: ListingWithBook[] = books.slice(1, 5).map((b, i) => ({
 
 function Section({ title, note, children }: { title: string; note?: string; children: ReactNode }) {
   return (
-    <section className="grid gap-6 border-t border-rule py-12">
+    <section className="grid gap-6 border-t border-outline-variant py-12">
       <div className="grid gap-1">
-        <h2 className="text-[22px]">{title}</h2>
-        {note ? <p className="max-w-lg text-[14px] text-ink-3">{note}</p> : null}
+        <h2 className="type-headline-md">{title}</h2>
+        {note ? <p className="max-w-xl type-body-lg text-on-surface-variant">{note}</p> : null}
       </div>
       {children}
     </section>
@@ -97,171 +124,187 @@ function Section({ title, note, children }: { title: string; note?: string; chil
 
 export default function StyleguidePage() {
   return (
-    <main className="mx-auto max-w-5xl px-4 pb-24 sm:px-6">
-      <header className="grid gap-4 py-16">
-        <p className="eyebrow">Design system · v0.1</p>
-        <h1 className="text-[32px] uppercase tracking-[0.2em] sm:text-[72px]">{site.name}</h1>
-        <p className="max-w-lg text-[17px] text-ink-2">
-          Inter, two values, no hue. Status is carried by form: fill, outline, dash, tint.
+    <main className="mx-auto max-w-6xl px-4 pb-24 sm:px-6 lg:px-8">
+      <header className="grid justify-items-start gap-5 py-16">
+        <Wordmark />
+        <p className="eyebrow">Design system · Material 3</p>
+        <h1 lang="en" className="type-display-lg max-w-[14ch]">Bookcloth green, set in Fraunces and Roboto Flex.</h1>
+        <p className="max-w-xl type-body-lg text-on-surface-variant">
+          Colour roles are a tonal spot scheme generated from one seed, #35614F. Status is carried by form as well as colour: fill, outline,
+          dash, tint.
         </p>
       </header>
 
-      <Section title="Colour" note="Ink #1c1c1c on paper #f2f2f2. Dark mode swaps the pair.">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {colors.map(([name, token, use]) => (
-            <div key={name} className="grid gap-2">
-              <div className="h-20 rounded-[2px] border border-rule" style={{ background: `var(${token})` }} />
-              <p className="text-[13px] font-medium">{name}</p>
-              <p className="-mt-2 text-[12px] text-ink-3">{use}</p>
+      <Section title="Colour roles" note="Each container pairs with its on colour. Dark mode is the same seed's dark scheme.">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {roles.map(([bg, fg, name, use]) => (
+            <div key={bg} className="grid h-32 content-between rounded-md p-4" style={{ background: `var(--md-${bg})`, color: `var(--md-${fg})` }}>
+              <p className="type-title-md">{name}</p>
+              <p className="type-body-sm opacity-80">{use}</p>
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+          {surfaces.map(([token, name]) => (
+            <div key={token} className="grid h-24 content-end rounded-md border border-outline-variant p-3" style={{ background: `var(--md-${token})` }}>
+              <p className="type-label-md text-on-surface-variant">{name}</p>
             </div>
           ))}
         </div>
       </Section>
 
-      <Section title="Type" note="Inter for Latin script, IBM Plex Sans Arabic for Arabic.">
-        <div className="grid gap-6">
-          <p className="text-[56px] font-medium leading-none tracking-[-0.02em]">Read slowly.</p>
-          <p className="text-[44px] leading-tight">Heading one, 44</p>
-          <p className="text-[28px] leading-tight">Heading two, 28</p>
-          <p className="text-[20px] font-medium">Heading three, 20</p>
-          <p className="reading max-w-xl">
-            Reading text, 17. The body of posts and reviews, set for long lines of thought. Every member here owns
-            books, reads books and passes them on.
-          </p>
-          <p className="text-[15px] text-ink-2">Interface text, 15. Buttons, forms, meta.</p>
-          <p className="eyebrow">Eyebrow label, 11, tracked 0.16em</p>
+      <Section title="Type scale" note="Fraunces is the brand face for display and headline roles. Roboto Flex carries everything you read and tap.">
+        <div className="grid gap-5">
+          {typeScale.map(([cls, name, sample]) => (
+            <div key={cls} className="grid gap-1 sm:grid-cols-[180px_1fr] sm:items-baseline sm:gap-6">
+              <p className="type-label-md text-on-surface-variant">{name}</p>
+              <p className={cls}>{sample}</p>
+            </div>
+          ))}
         </div>
       </Section>
 
-      <Section title="Buttons">
+      <Section title="Shape" note="The M3 corner scale. Buttons and chips are full or small; cards medium; hero blocks extra large.">
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
+          {shapes.map(([cls, name]) => (
+            <div key={cls} className="grid gap-2">
+              <div className={`h-20 bg-primary-container ${cls}`} />
+              <p className="type-label-md text-on-surface-variant">{name}</p>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Buttons" note="Filled for the one main action on a screen, tonal and outlined for the rest, text for low emphasis.">
         <div className="flex flex-wrap items-center gap-3">
-          <Button>Buy this copy</Button>
-          <Button variant="secondary">Message seller</Button>
-          <Button variant="ghost">Cancel</Button>
-          <Button variant="danger">Remove</Button>
+          <Button>Filled</Button>
+          <Button variant="tonal">Tonal</Button>
+          <Button variant="elevated">Elevated</Button>
+          <Button variant="secondary">Outlined</Button>
+          <Button variant="ghost">Text</Button>
+          <Button variant="danger" icon="logout">
+            Sign out
+          </Button>
           <Button disabled>Disabled</Button>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <Button size="sm">Save</Button>
-          <Button size="sm" variant="secondary">Edit</Button>
-          <Button size="sm" variant="danger">Withdraw</Button>
+          <Button size="lg" iconEnd="arrow_forward">
+            Claim your seat
+          </Button>
+          <Button size="sm" icon="add">
+            Add
+          </Button>
+          <IconButton icon="settings" label="Settings" />
+          <IconButton icon="search" label="Search" />
         </div>
       </Section>
 
-      <Section title="Fields">
-        <div className="grid gap-5 sm:grid-cols-2">
+      <Section title="Status chips" note="Readable in greyscale: solid means for sale or paid, outline means in progress, dashed means open to swap.">
+        <div className="flex flex-wrap gap-2">
+          <ReadingBadge status="reading" />
+          <ReadingBadge status="read" />
+          <ReadingBadge status="unread" />
+          <SwapBadge />
+          <SaleBadge priceMinor={90000} currency="DZD" />
+          <ListingBadge status="reserved" />
+          <TransactionBadge status="paid" />
+          <TransactionBadge status="pending" />
+          <TransactionBadge status="refund_due" />
+          <Badge tone="outline" dot>
+            Founder
+          </Badge>
+        </div>
+      </Section>
+
+      <Section title="Fields" note="Filled text fields. The active indicator thickens and turns primary on focus.">
+        <div className="grid max-w-2xl gap-5 sm:grid-cols-2">
           <Field label="Title">
-            <Input placeholder="Season of Migration to the North" />
+            <Input placeholder="The Stranger" />
           </Field>
-          <Field label="Reading status">
+          <Field label="Status">
             <Select defaultValue="reading">
               <option value="unread">Unread</option>
               <option value="reading">Reading</option>
               <option value="read">Read</option>
             </Select>
           </Field>
-          <Field label="Your thought" hint="Plain text. Line breaks are kept." className="sm:col-span-2">
-            <Textarea placeholder="What stayed with you?" />
+          <Field label="Note" hint="Up to 500 characters." className="sm:col-span-2">
+            <Textarea rows={3} placeholder="Condition, edition, where you can hand it over" />
           </Field>
-          <div className="flex flex-wrap items-center gap-6">
-            <Segmented
-              name="kind-demo"
-              defaultValue="review"
-              options={[
-                { value: 'thought', label: 'Thought' },
-                { value: 'review', label: 'Review' },
-                { value: 'idea', label: 'Idea' },
-              ]}
-            />
-            <Checkbox label="Open to swap" defaultChecked />
+          <Checkbox label="Open to swap" defaultChecked className="sm:col-span-2" />
+          <div className="sm:col-span-2">
+          <Segmented
+            name="kind"
+            defaultValue="review"
+            options={[
+              { value: 'thought', label: 'Thought' },
+              { value: 'review', label: 'Review' },
+              { value: 'idea', label: 'Idea' },
+            ]}
+          />
           </div>
         </div>
       </Section>
 
-      <Section title="Status" note="Shelf, market and ledger states. No colour coding, so it survives greyscale and colour blindness.">
-        <div className="grid gap-4">
-          <div className="flex flex-wrap gap-2">
-            <ReadingBadge status="reading" />
-            <ReadingBadge status="read" />
-            <ReadingBadge status="unread" />
-            <SwapBadge />
-            <SaleBadge priceMinor={90000} currency="DZD" />
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <ListingBadge status="active" />
-            <ListingBadge status="reserved" />
-            <ListingBadge status="sold" />
-            <ListingBadge status="withdrawn" />
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <TransactionBadge status="pending" />
-            <TransactionBadge status="paid" />
-            <TransactionBadge status="refund_due" />
-            <TransactionBadge status="cancelled" />
-            <Badge tone="outline">Admin</Badge>
-          </div>
+      <Section title="Cards">
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Card variant="tonal" className="p-5 type-title-md">Tonal</Card>
+          <Card variant="elevated" className="p-5 type-title-md">Elevated</Card>
+          <Card variant="outlined" className="p-5 type-title-md">Outlined</Card>
         </div>
-      </Section>
-
-      <Section title="Covers" note="Typographic jackets. A real cover from Open Library layers on top when the ISBN has one.">
-        <div className="flex flex-wrap items-end gap-5">
-          {books.map((b, i) => (
-            <BookCover key={b.title} {...b} size={i === 0 ? 'lg' : 'md'} />
-          ))}
-          <BookCover {...books[3]} size="sm" />
-        </div>
-      </Section>
-
-      <Section title="Feed">
-        <div className="max-w-2xl">
+        <div className="grid gap-6 lg:grid-cols-2">
           <PostCard post={samplePost} />
-        </div>
-      </Section>
-
-      <Section title="Shelf">
-        <div className="max-w-2xl">
           <ShelfCard item={sampleShelf} />
         </div>
-      </Section>
-
-      <Section title="Market" note="Seller view shows the commission split live as they type the price.">
-        <div className="grid gap-10 lg:grid-cols-[1fr_320px]">
-          <div className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-4">
-            {sampleListings.map((l, i) => (
-              <ListingCard key={l.id} listing={l} locale="en" index={i} />
-            ))}
-          </div>
-          <div className="h-fit border border-rule bg-surface p-5">
-            <p className="eyebrow mb-4">Seller receives</p>
-            <PriceBreakdown
-              amountMinor={90000}
-              bps={700}
-              currency="DZD"
-              locale="en"
-              labels={{ buyerPays: 'Buyer pays', commission: 'Platform commission (7%)', youReceive: 'You receive' }}
-            />
-          </div>
+        <div className="-mx-2 grid grid-cols-2 gap-x-2 gap-y-6 sm:grid-cols-4">
+          {sampleListings.map((l, i) => (
+            <ListingCard key={l.id} listing={l} locale="en" index={i} />
+          ))}
         </div>
       </Section>
 
-      <Section title="Chat" note="Messages fade in the last quarter of their life, then disappear.">
-        <div className="grid max-w-xl gap-4 border border-rule p-5">
-          <MessageLine author="Yacine B." body="Anyone reading Dib this week?" time="09:12" expiresIn="3h" expiresLabel="disappears in 3h" mine={false} life={0.12} />
-          <MessageLine author="You" body="Halfway through The Big House. Slow start, worth it." time="11:40" expiresIn="14h" expiresLabel="disappears in 14h" mine life={0.6} />
-          <MessageLine author="Amina Kaci" body="I have a spare copy if anyone wants to swap." time="12:02" expiresIn="23h" expiresLabel="disappears in 23h" mine={false} />
+      <Section title="Jackets and avatars" note="Typographic covers in the scheme's tonal roles. A real cover image sits on top when one exists.">
+        <div className="flex flex-wrap items-end gap-4">
+          {books.map((b) => (
+            <BookCover key={b.title} {...b} size="md" />
+          ))}
         </div>
-      </Section>
-
-      <Section title="Pieces">
-        <div className="flex flex-wrap items-center gap-6">
+        <div className="flex flex-wrap items-center gap-4">
           <Monogram name="Amina" size="lg" />
           <Monogram name="Yacine" />
           <Monogram name="Lina" size="sm" />
           <Rating value={4} label="4 out of 5" />
-          <Rating value={2} label="2 out of 5" />
         </div>
-        <Rule label="Chapter two" />
+      </Section>
+
+      <Section title="Market and chat">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <PriceBreakdown amountMinor={120000} bps={700} currency="DZD" locale="en" labels={{ buyerPays: 'Buyer pays', commission: 'Platform commission (7%)', youReceive: 'You receive' }} />
+          <div className="grid gap-4 rounded-xl bg-surface-low p-5">
+            <MessageLine author="Amina" body="Anyone finished Nedjma yet?" time="21:04" expiresIn="5h" expiresLabel="disappears in 5h" mine={false} life={0.2} />
+            <MessageLine author="You" body="Last night. Swap for your Dib?" time="21:06" expiresIn="6h" expiresLabel="disappears in 6h" mine life={0.9} />
+          </div>
+        </div>
+      </Section>
+
+      <Section title="Empty state">
         <Empty title="Your shelf is empty.">Add the books you own. Mark what you would swap or sell.</Empty>
+      </Section>
+
+      <Section title="Motion" note="M3 easing tokens through Motion. Emphasized for movement on screen, emphasized decelerate for entrances. Everything respects reduced motion.">
+        <dl className="grid gap-3 sm:grid-cols-3">
+          {[
+            ['Emphasized', 'cubic-bezier(0.2, 0, 0, 1)', 'Nav indicator, accordions, cover fan'],
+            ['Decelerate', 'cubic-bezier(0.05, 0.7, 0.1, 1)', 'Page enter, reveals, new messages'],
+            ['Accelerate', 'cubic-bezier(0.3, 0, 0.8, 0.15)', 'Exits'],
+          ].map(([name, curve, use]) => (
+            <div key={name} className="grid gap-1 rounded-md bg-surface-low p-5">
+              <dt className="type-title-md">{name}</dt>
+              <dd className="type-body-sm text-on-surface-variant">{curve}</dd>
+              <dd className="type-body-md">{use}</dd>
+            </div>
+          ))}
+        </dl>
       </Section>
     </main>
   )
