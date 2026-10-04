@@ -1,11 +1,14 @@
 import type { ReactNode } from 'react'
 
-export function PageHeader({ eyebrow, title, children }: { eyebrow?: string; title: string; children?: ReactNode }) {
+export function PageHeader({ eyebrow, title, action, children }: { eyebrow?: string; title: string; action?: ReactNode; children?: ReactNode }) {
   return (
-    <header className="grid gap-3 pb-8">
-      {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
-      <h1 className="text-[34px] sm:text-[44px]">{title}</h1>
-      {children ? <div className="max-w-xl text-[15px] text-ink-2">{children}</div> : null}
+    <header className="animate-rise flex flex-wrap items-end justify-between gap-x-6 gap-y-4 pb-8">
+      <div className="grid gap-2">
+        {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
+        <h1 className="type-display-sm sm:type-display-md">{title}</h1>
+        {children ? <div className="max-w-xl type-body-lg text-on-surface-variant">{children}</div> : null}
+      </div>
+      {action}
     </header>
   )
 }

@@ -1,75 +1,159 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   Design tokens. Two values drive everything: ink #1c1c1c, paper #f2f2f2.
-   Dark mode swaps them. Status is carried by form (fill, outline, dash),
-   not hue, so the system stays monochrome. Red is reserved for errors.
+   Fahrasah design system, built on Material 3.
+   Colour roles are a tonal spot scheme generated from one seed, bookcloth
+   green #35614F, with material-color-utilities. Dark mode is the same seed's
+   dark scheme. Status is still carried by form (fill, outline, dash, tint)
+   as well as colour, so it survives greyscale and colour blindness.
    --------------------------------------------------------------------------- */
 :root {
-  --paper: #f2f2f2;
-  --surface: #f9f9f9;
-  --sunken: #e8e8e8;
-  --ink: #1c1c1c;
-  --ink-2: #4a4a4a;
-  --ink-3: #6b6b6b;
-  --rule: #d9d9d9;
-  --rule-strong: #bdbdbd;
-  --danger: #b3261e;
+  --md-primary: #1c6b50;
+  --md-on-primary: #ffffff;
+  --md-primary-container: #a7f2d1;
+  --md-on-primary-container: #00513b;
+  --md-secondary: #4c6358;
+  --md-on-secondary: #ffffff;
+  --md-secondary-container: #cfe9da;
+  --md-on-secondary-container: #354b41;
+  --md-tertiary: #3e6374;
+  --md-on-tertiary: #ffffff;
+  --md-tertiary-container: #c2e8fc;
+  --md-on-tertiary-container: #254b5c;
+  --md-error: #ba1a1a;
+  --md-on-error: #ffffff;
+  --md-error-container: #ffdad6;
+  --md-on-error-container: #93000a;
+  --md-surface: #f5fbf5;
+  --md-on-surface: #171d1a;
+  --md-on-surface-variant: #404944;
+  --md-surface-container-lowest: #ffffff;
+  --md-surface-container-low: #eff5f0;
+  --md-surface-container: #eaefea;
+  --md-surface-container-high: #e4eae4;
+  --md-surface-container-highest: #dee4df;
+  --md-outline: #707974;
+  --md-outline-variant: #bfc9c2;
+  --md-inverse-surface: #2c322e;
+  --md-inverse-on-surface: #ecf2ed;
+  --md-inverse-primary: #8bd6b5;
+  --md-shadow: 0 0 0;
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: #1c1c1c;
-    --surface: #242424;
-    --sunken: #161616;
-    --ink: #f2f2f2;
-    --ink-2: #c4c4c4;
-    --ink-3: #9a9a9a;
-    --rule: #333333;
-    --rule-strong: #474747;
-    --danger: #f2877f;
+    --md-primary: #8bd6b5;
+    --md-on-primary: #003827;
+    --md-primary-container: #00513b;
+    --md-on-primary-container: #a7f2d1;
+    --md-secondary: #b3ccbf;
+    --md-on-secondary: #1f352b;
+    --md-secondary-container: #354b41;
+    --md-on-secondary-container: #cfe9da;
+    --md-tertiary: #a6cce0;
+    --md-on-tertiary: #093544;
+    --md-tertiary-container: #254b5c;
+    --md-on-tertiary-container: #c2e8fc;
+    --md-error: #ffb4ab;
+    --md-on-error: #690005;
+    --md-error-container: #93000a;
+    --md-on-error-container: #ffdad6;
+    --md-surface: #0f1512;
+    --md-on-surface: #dee4df;
+    --md-on-surface-variant: #bfc9c2;
+    --md-surface-container-lowest: #0a0f0d;
+    --md-surface-container-low: #171d1a;
+    --md-surface-container: #1b211e;
+    --md-surface-container-high: #252b28;
+    --md-surface-container-highest: #303633;
+    --md-outline: #89938d;
+    --md-outline-variant: #404944;
+    --md-inverse-surface: #dee4df;
+    --md-inverse-on-surface: #2c322e;
+    --md-inverse-primary: #1c6b50;
     color-scheme: dark;
   }
 }
 
 @theme inline {
-  --color-paper: var(--paper);
-  --color-surface: var(--surface);
-  --color-sunken: var(--sunken);
-  --color-ink: var(--ink);
-  --color-ink-2: var(--ink-2);
-  --color-ink-3: var(--ink-3);
-  --color-rule: var(--rule);
-  --color-rule-strong: var(--rule-strong);
-  --color-danger: var(--danger);
+  --color-primary: var(--md-primary);
+  --color-on-primary: var(--md-on-primary);
+  --color-primary-container: var(--md-primary-container);
+  --color-on-primary-container: var(--md-on-primary-container);
+  --color-secondary: var(--md-secondary);
+  --color-on-secondary: var(--md-on-secondary);
+  --color-secondary-container: var(--md-secondary-container);
+  --color-on-secondary-container: var(--md-on-secondary-container);
+  --color-tertiary: var(--md-tertiary);
+  --color-on-tertiary: var(--md-on-tertiary);
+  --color-tertiary-container: var(--md-tertiary-container);
+  --color-on-tertiary-container: var(--md-on-tertiary-container);
+  --color-error: var(--md-error);
+  --color-on-error: var(--md-on-error);
+  --color-error-container: var(--md-error-container);
+  --color-on-error-container: var(--md-on-error-container);
+  --color-surface: var(--md-surface);
+  --color-on-surface: var(--md-on-surface);
+  --color-on-surface-variant: var(--md-on-surface-variant);
+  --color-surface-lowest: var(--md-surface-container-lowest);
+  --color-surface-low: var(--md-surface-container-low);
+  --color-surface-container: var(--md-surface-container);
+  --color-surface-high: var(--md-surface-container-high);
+  --color-surface-highest: var(--md-surface-container-highest);
+  --color-outline: var(--md-outline);
+  --color-outline-variant: var(--md-outline-variant);
+  --color-inverse-surface: var(--md-inverse-surface);
+  --color-inverse-on-surface: var(--md-inverse-on-surface);
+  --color-inverse-primary: var(--md-inverse-primary);
 
-  /* Adobe Fonts (futura-pt) or the system Futura when present, Jost otherwise. */
-  --font-sans: "futura-pt", Futura, var(--font-jost), "Century Gothic", ui-sans-serif, sans-serif;
+  /* Plain: Roboto Flex for everything you read and tap.
+     Brand: Fraunces for display and headline roles only. */
+  --font-sans: var(--font-plain), "Roboto", ui-sans-serif, system-ui, sans-serif;
+  --font-brand: var(--font-display), Georgia, "Times New Roman", serif;
+  --font-arabic: var(--font-kufi), "Noto Kufi Arabic", sans-serif;
+
+  /* M3 shape scale. */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 28px;
+
+  /* M3 elevation levels 1 to 3. */
+  --shadow-e1: 0 1px 2px rgb(var(--md-shadow) / 0.3), 0 1px 3px 1px rgb(var(--md-shadow) / 0.15);
+  --shadow-e2: 0 1px 2px rgb(var(--md-shadow) / 0.3), 0 2px 6px 2px rgb(var(--md-shadow) / 0.15);
+  --shadow-e3: 0 4px 8px 3px rgb(var(--md-shadow) / 0.15), 0 1px 3px rgb(var(--md-shadow) / 0.3);
+
+  /* M3 motion tokens. */
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --ease-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
 }
 
 @layer base {
   html {
-    background: var(--paper);
-    color: var(--ink);
+    background: var(--md-surface);
+    color: var(--md-on-surface);
     -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
   }
 
   body {
     min-height: 100dvh;
     font-family: var(--font-sans);
-    font-size: 15px;
-    line-height: 1.55;
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0.016em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   h1,
   h2,
-  h3 {
-    font-weight: 500;
-    letter-spacing: -0.015em;
-    line-height: 1.1;
+  h3,
+  h4 {
     text-wrap: balance;
   }
 
@@ -78,60 +162,228 @@
   }
 
   ::selection {
-    background: var(--ink);
-    color: var(--paper);
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
   }
 
   :focus-visible {
-    outline: 2px solid var(--ink);
+    outline: 3px solid var(--md-secondary);
     outline-offset: 2px;
+  }
+
+  /* Icon font fallback: if Material Symbols fails, the ligature name stays
+     clipped to one glyph width instead of breaking the layout. */
+  .material-symbols-rounded {
+    display: inline-block;
+    width: 1em;
+    overflow: hidden;
+    flex-shrink: 0;
+    user-select: none;
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+    transition: font-variation-settings 200ms var(--ease-standard);
   }
 }
 
-/* Small uppercase label, the system's main typographic signature. */
-@utility eyebrow {
-  font-size: 11px;
+/* ---------------------------------------------------------------------------
+   M3 type scale. Display and headline use the brand face.
+   --------------------------------------------------------------------------- */
+@utility type-display-lg {
+  font-family: var(--font-brand);
+  font-size: clamp(2.75rem, 1.6rem + 5vw, 3.5625rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+}
+
+@utility type-display-md {
+  font-family: var(--font-brand);
+  font-size: clamp(2.25rem, 1.5rem + 3vw, 2.8125rem);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  font-weight: 400;
+  font-variation-settings: "opsz" 120, "SOFT" 50;
+}
+
+@utility type-display-sm {
+  font-family: var(--font-brand);
+  font-size: 2.25rem;
+  line-height: 2.75rem;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+  font-variation-settings: "opsz" 96, "SOFT" 50;
+}
+
+@utility type-headline-lg {
+  font-family: var(--font-brand);
+  font-size: 2rem;
+  line-height: 2.5rem;
+  font-weight: 400;
+  font-variation-settings: "opsz" 72, "SOFT" 50;
+}
+
+@utility type-headline-md {
+  font-family: var(--font-brand);
+  font-size: 1.75rem;
+  line-height: 2.25rem;
+  font-weight: 400;
+  font-variation-settings: "opsz" 48, "SOFT" 50;
+}
+
+@utility type-headline-sm {
+  font-family: var(--font-brand);
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 400;
+  font-variation-settings: "opsz" 36, "SOFT" 50;
+}
+
+@utility type-title-lg {
+  font-size: 1.375rem;
+  line-height: 1.75rem;
   font-weight: 500;
-  letter-spacing: 0.16em;
+  letter-spacing: 0;
+}
+
+@utility type-title-md {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 500;
+  letter-spacing: 0.009em;
+}
+
+@utility type-title-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  letter-spacing: 0.007em;
+}
+
+@utility type-body-lg {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  letter-spacing: 0.031em;
+}
+
+@utility type-body-md {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  letter-spacing: 0.018em;
+}
+
+@utility type-body-sm {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  letter-spacing: 0.033em;
+}
+
+@utility type-label-lg {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  letter-spacing: 0.007em;
+}
+
+@utility type-label-md {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.042em;
+}
+
+@utility type-label-sm {
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.045em;
+}
+
+/* Section label above a heading. */
+@utility eyebrow {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--ink-3);
+  color: var(--md-primary);
 }
 
 /* Long-form text: posts, reviews, bios. */
 @utility reading {
-  font-size: 1.0625rem;
-  line-height: 1.7;
-  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.625rem;
+  letter-spacing: 0.01em;
+  color: var(--md-on-surface);
 }
 
 @utility tabular {
   font-variant-numeric: tabular-nums;
 }
 
-/* Motion: one entrance, staggered by --i. No animation library needed. */
+/* ---------------------------------------------------------------------------
+   M3 state layer: a currentColor veil at 8% on hover, 10% on focus and press.
+   --------------------------------------------------------------------------- */
+@utility state-layer {
+  position: relative;
+  isolation: isolate;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: currentColor;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 150ms var(--ease-standard);
+    z-index: -1;
+  }
+  &:hover::after {
+    opacity: 0.08;
+  }
+  &:focus-visible::after,
+  &:active::after {
+    opacity: 0.1;
+  }
+}
+
+/* Entrance for server rendered lists, staggered by --i. */
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(12px);
   }
 }
 
 @utility animate-rise {
-  animation: rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
-  animation-delay: calc(min(var(--i, 0), 12) * 35ms);
+  animation: rise 500ms var(--ease-decelerate) both;
+  animation-delay: calc(min(var(--i, 0), 12) * 40ms);
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@utility animate-marquee {
+  animation: marquee 40s linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   *,
   ::before,
   ::after {
     animation-duration: 1ms !important;
     animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
   }
 }
 
-/* Composer: rating and book fields only show for reviews. No JS. */
+/* Composer: rating field only shows for reviews. No JS. */
 .composer .review-only {
   display: none;
 }

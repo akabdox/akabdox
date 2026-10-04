@@ -1,5 +1,6 @@
 export const site = {
-  name: 'Marginalia',
+  name: 'Fahrasah',
+  arabic: 'فهرسة',
   tagline: 'A private library of a thousand readers.',
 }
 

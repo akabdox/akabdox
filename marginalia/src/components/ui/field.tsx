@@ -1,8 +1,10 @@
 import type { ComponentProps, ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 
+// Material 3 filled text field: tonal container, active indicator that
+// thickens and turns primary on focus.
 const control =
-  'w-full rounded-[2px] border border-rule bg-surface text-[15px] text-ink placeholder:text-ink-3 outline-none transition-colors hover:border-rule-strong focus:border-ink'
+  'w-full rounded-t-xs border-0 border-b border-on-surface-variant bg-surface-highest type-body-lg text-on-surface placeholder:text-on-surface-variant/70 outline-none transition-[border-color,box-shadow,background-color] duration-200 hover:bg-[color-mix(in_srgb,var(--md-on-surface)_8%,var(--md-surface-container-highest))] focus:border-primary focus:shadow-[inset_0_-1px_0_var(--md-primary)] focus-visible:outline-none'
 
 export function Field({
   label,
@@ -17,24 +19,24 @@ export function Field({
 }) {
   return (
     <label className={cn('grid gap-1.5', className)}>
-      <span className="eyebrow">{label}</span>
+      <span className="type-label-lg text-on-surface-variant">{label}</span>
       {children}
-      {hint ? <span className="text-[13px] text-ink-3">{hint}</span> : null}
+      {hint ? <span className="px-4 type-body-sm text-on-surface-variant">{hint}</span> : null}
     </label>
   )
 }
 
 export function Input({ className, ...props }: ComponentProps<'input'>) {
-  return <input className={cn(control, 'h-11 px-3', className)} {...props} />
+  return <input className={cn(control, 'h-14 px-4', className)} {...props} />
 }
 
 export function Textarea({ className, rows = 4, ...props }: ComponentProps<'textarea'>) {
-  return <textarea rows={rows} className={cn(control, 'resize-y px-3 py-2.5 leading-relaxed', className)} {...props} />
+  return <textarea rows={rows} className={cn(control, 'resize-y px-4 py-4', className)} {...props} />
 }
 
 export function Select({ className, children, ...props }: ComponentProps<'select'>) {
   return (
-    <select className={cn(control, 'h-11 appearance-none bg-no-repeat px-3 pr-9', className)} style={{ backgroundImage: chevron, backgroundPosition: 'right 12px center', backgroundSize: '10px' }} {...props}>
+    <select className={cn(control, 'h-14 appearance-none bg-no-repeat px-4 pr-11', className)} style={{ backgroundImage: chevron, backgroundPosition: 'right 16px center', backgroundSize: '12px' }} {...props}>
       {children}
     </select>
   )
@@ -42,14 +44,14 @@ export function Select({ className, children, ...props }: ComponentProps<'select
 
 export function Checkbox({ label, className, ...props }: ComponentProps<'input'> & { label: string }) {
   return (
-    <label className={cn('inline-flex cursor-pointer items-center gap-2.5 text-[14px] text-ink-2', className)}>
-      <input type="checkbox" className="size-4 accent-ink" {...props} />
+    <label className={cn('inline-flex min-h-10 cursor-pointer items-center gap-3 type-body-lg text-on-surface', className)}>
+      <input type="checkbox" className="size-[18px] rounded-[2px] accent-[var(--md-primary)]" {...props} />
       {label}
     </label>
   )
 }
 
-// Segmented radio group, e.g. post kind. Pure CSS state via :has.
+// M3 segmented button. Pure CSS state via :has.
 export function Segmented({
   name,
   options,
@@ -60,13 +62,16 @@ export function Segmented({
   defaultValue: string
 }) {
   return (
-    <div className="inline-flex rounded-[2px] border border-rule p-0.5" role="radiogroup">
+    <div className="inline-flex h-10 overflow-hidden rounded-full border border-outline" role="radiogroup">
       {options.map((o) => (
         <label
           key={o.value}
-          className="cursor-pointer rounded-[1px] px-3.5 py-1.5 text-[10.5px] font-medium uppercase tracking-[0.14em] text-ink-3 transition-colors hover:text-ink has-[:checked]:bg-ink has-[:checked]:text-paper has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ink"
+          className="state-layer flex cursor-pointer items-center gap-2 border-l border-outline px-4 type-label-lg text-on-surface first:border-l-0 has-[:checked]:bg-secondary-container has-[:checked]:text-on-secondary-container has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2 has-[:focus-visible]:outline-secondary sm:px-5"
         >
-          <input type="radio" name={name} value={o.value} defaultChecked={o.value === defaultValue} className="sr-only" />
+          <input type="radio" name={name} value={o.value} defaultChecked={o.value === defaultValue} className="peer sr-only" />
+          <span aria-hidden className="material-symbols-rounded hidden text-[18px] peer-checked:inline-block">
+            check
+          </span>
           {o.label}
         </label>
       ))}
@@ -75,4 +80,4 @@ export function Segmented({
 }
 
 const chevron =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%236b6b6b' stroke-width='1.3'/%3E%3C/svg%3E\")"
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23707974' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E\")"

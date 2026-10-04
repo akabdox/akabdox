@@ -14,14 +14,14 @@ export default async function JoinPage({ searchParams }: { searchParams: Promise
   return (
     <>
       <div className="grid gap-2">
-        <h1 className="text-[32px]">Claim your seat.</h1>
-        <p className="text-ink-2">
+        <h1 className="type-headline-lg">Claim your seat.</h1>
+        <p className="type-body-lg text-on-surface-variant">
           {code ? 'You were invited. Choose how you appear to other readers.' : 'Membership is by invitation. Open the link the owner sent you.'}
         </p>
       </div>
       <ActionForm action={signUp}>
         <input type="hidden" name="invite_code" value={code ?? ''} />
-        <Field label="Username" hint="Letters, numbers, underscores.">
+        <Field label="Username" hint="3 to 24 letters, numbers or underscores.">
           <Input name="username" required pattern="[A-Za-z0-9_]{3,24}" autoComplete="username" />
         </Field>
         <Field label="Display name">
@@ -33,11 +33,13 @@ export default async function JoinPage({ searchParams }: { searchParams: Promise
         <Field label="Password">
           <Input name="password" type="password" required minLength={8} autoComplete="new-password" />
         </Field>
-        <SubmitButton pendingLabel="Joining">Join the library</SubmitButton>
+        <SubmitButton pendingLabel="Joining" className="mt-2 w-full">
+          Join the library
+        </SubmitButton>
       </ActionForm>
-      <p className="text-[14px] text-ink-3">
+      <p className="type-body-md text-on-surface-variant">
         Already a member?{' '}
-        <Link href="/login" className="text-ink underline underline-offset-4">
+        <Link href="/login" className="font-medium text-primary underline underline-offset-4">
           Sign in
         </Link>
       </p>

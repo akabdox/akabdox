@@ -1,14 +1,16 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
-import { site } from '@/lib/site'
+import { Wordmark } from '@/components/wordmark'
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <main className="mx-auto grid min-h-dvh w-full max-w-sm content-center gap-10 px-4 py-16">
-      <Link href="/" className="text-[15px] font-medium uppercase tracking-[0.28em]">
-        {site.name}
-      </Link>
-      {children}
+    <main className="grid min-h-dvh place-items-center bg-surface-container px-4 py-12">
+      <div className="grid w-full max-w-md gap-8">
+        <Link href="/" className="justify-self-center">
+          <Wordmark />
+        </Link>
+        <div className="animate-rise grid gap-8 rounded-xl bg-surface p-6 shadow-e1 sm:p-10">{children}</div>
+      </div>
     </main>
   )
 }

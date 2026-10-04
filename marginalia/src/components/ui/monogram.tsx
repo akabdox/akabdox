@@ -1,6 +1,18 @@
 import { cn } from '@/lib/cn'
 
-const sizes = { sm: 'size-7 text-[11px]', md: 'size-10 text-[14px]', lg: 'size-16 text-[22px]' }
+const sizes = { sm: 'size-8 type-label-lg', md: 'size-10 type-title-md', lg: 'size-20 text-[32px]' }
+
+const tones = [
+  'bg-primary-container text-on-primary-container',
+  'bg-secondary-container text-on-secondary-container',
+  'bg-tertiary-container text-on-tertiary-container',
+]
+
+function pick(seed: string): string {
+  let h = 0
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) | 0
+  return tones[Math.abs(h) % tones.length]
+}
 
 // Typographic avatar: no uploads, no storage bill, always on brand.
 export function Monogram({
@@ -14,14 +26,7 @@ export function Monogram({
 }) {
   const initial = name.trim().charAt(0).toUpperCase() || '?'
   return (
-    <span
-      aria-hidden
-      className={cn(
-        'inline-flex shrink-0 items-center justify-center rounded-full border border-ink font-medium text-ink',
-        sizes[size],
-        className,
-      )}
-    >
+    <span aria-hidden className={cn('inline-flex shrink-0 items-center justify-center rounded-full font-medium', sizes[size], pick(name), className)}>
       {initial}
     </span>
   )

@@ -11,8 +11,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <>
       <div className="grid gap-2">
-        <h1 className="text-[32px]">Welcome back.</h1>
-        <p className="text-ink-2">Members only.</p>
+        <h1 className="type-headline-lg">Welcome back.</h1>
+        <p className="type-body-lg text-on-surface-variant">Sign in to your shelf, the feed and the market.</p>
       </div>
       <ActionForm action={signIn}>
         <input type="hidden" name="next" value={next ?? '/feed'} />
@@ -22,8 +22,13 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <Field label="Password">
           <Input name="password" type="password" autoComplete="current-password" required />
         </Field>
-        <SubmitButton pendingLabel="Signing in">Sign in</SubmitButton>
+        <SubmitButton pendingLabel="Signing in" className="mt-2 w-full">
+          Sign in
+        </SubmitButton>
       </ActionForm>
+      <p className="type-body-md text-on-surface-variant">
+        Have an invite link? Open it to claim your seat.
+      </p>
     </>
   )
 }
