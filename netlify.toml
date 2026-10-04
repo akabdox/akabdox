@@ -1,0 +1,12 @@
+# The app lives in marginalia/; the repo root is the GitHub profile README.
+[build]
+  base = "marginalia"
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Server rendering, server actions and proxy.ts need the Next.js runtime.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
