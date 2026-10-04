@@ -1,11 +1,11 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { BackLink } from '@/components/back-link'
 import { PostCard } from '@/components/post-card'
 import { ActionForm } from '@/components/ui/action-form'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/field'
 import { Monogram } from '@/components/ui/monogram'
-import { Rule } from '@/components/ui/rule'
 import { SubmitButton } from '@/components/ui/submit-button'
 import { createClient } from '@/lib/supabase/server'
 import { requireViewer } from '@/lib/viewer'
@@ -36,36 +36,37 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
   const canDelete = p.author_id === viewer.id || viewer.role === 'admin'
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <Link href="/feed" className="eyebrow hover:text-ink">
-        ← Feed
-      </Link>
+    <div className="mx-auto grid max-w-2xl gap-4">
+      <BackLink href="/feed">Feed</BackLink>
       <PostCard post={p} full />
       {canDelete ? (
-        <form action={deletePost} className="mt-3">
+        <form action={deletePost}>
           <input type="hidden" name="id" value={p.id} />
-          <Button type="submit" variant="ghost" className="text-[11px]">
+          <Button type="submit" variant="ghost" size="sm" icon="delete" className="text-error">
             Delete post
           </Button>
         </form>
       ) : null}
 
-      <Rule label={`${replies.length} ${replies.length === 1 ? 'reply' : 'replies'}`} className="mt-10 mb-2" />
+      <h2 className="mt-6 type-title-lg">
+        {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
+      </h2>
 
+      <div className="grid gap-1">
       {replies.map((c) => (
-        <div key={c.id} className="grid grid-cols-[auto_1fr] gap-3 border-b border-rule py-5">
+        <div key={c.id} className="grid grid-cols-[auto_1fr] gap-3 rounded-md px-1 py-4">
           <Monogram name={c.author.display_name} size="sm" />
           <div className="grid gap-1">
-            <p className="flex items-center gap-3 text-[13px]">
-              <Link href={`/u/${c.author.username}`} className="font-medium hover:underline">
+            <p className="flex items-center gap-3 type-body-sm">
+              <Link href={`/u/${c.author.username}`} className="type-title-sm hover:underline">
                 {c.author.display_name}
               </Link>
-              <span className="text-ink-3">{timeAgo(c.created_at)}</span>
+              <span className="text-on-surface-variant">{timeAgo(c.created_at)}</span>
               {c.author_id === viewer.id || viewer.role === 'admin' ? (
                 <form action={deleteComment} className="ml-auto">
                   <input type="hidden" name="id" value={c.id} />
                   <input type="hidden" name="post_id" value={p.id} />
-                  <button type="submit" className="eyebrow hover:text-danger">
+                  <button type="submit" className="state-layer rounded-full px-3 py-1.5 type-label-md text-on-surface-variant hover:text-error">
                     Delete
                   </button>
                 </form>
@@ -75,11 +76,12 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
           </div>
         </div>
       ))}
+      </div>
 
-      <ActionForm action={addComment} className="mt-6">
+      <ActionForm action={addComment} className="rounded-xl bg-surface-low p-4 sm:p-5">
         <input type="hidden" name="post_id" value={p.id} />
         <Textarea name="body" required maxLength={2000} rows={3} placeholder="Add to the conversation" aria-label="Reply" />
-        <SubmitButton className="justify-self-end" pendingLabel="Replying">
+        <SubmitButton className="justify-self-end" icon="send" pendingLabel="Replying">
           Reply
         </SubmitButton>
       </ActionForm>

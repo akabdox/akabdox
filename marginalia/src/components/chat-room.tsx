@@ -4,8 +4,10 @@ import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEven
 import { createClient } from '@/lib/supabase/client'
 import { timeLeft } from '@/lib/time'
 import type { Author, Message } from '@/lib/types'
+import { AnimatePresence, motion } from 'motion/react'
 import { MessageLine } from './message-line'
-import { Button } from './ui/button'
+import { Icon } from './ui/icon'
+import { ease } from '@/lib/motion'
 
 const clock = new Intl.DateTimeFormat('en', { hour: '2-digit', minute: '2-digit', hour12: false })
 
@@ -95,28 +97,41 @@ export function ChatRoom({
   }
 
   return (
-    <div className="grid gap-4">
-      <div className="grid min-h-[50dvh] content-end gap-4 border border-rule bg-paper p-4 sm:p-5">
-        {visible.length === 0 ? <p className="py-16 text-center text-[14px] text-ink-3">The room is empty. Say something.</p> : null}
-        {visible.map((m) => {
-          const created = Date.parse(m.created_at)
-          const expires = Date.parse(m.expires_at)
-          return (
-            <MessageLine
-              key={m.id}
-              author={people[m.author_id]?.display_name ?? '…'}
-              body={m.body}
-              time={clock.format(created)}
-              expiresIn={timeLeft(m.expires_at, now)}
-              mine={m.author_id === viewerId}
-              life={(expires - now) / (expires - created)}
-            />
-          )
-        })}
+    <div className="grid gap-3">
+      <div className="grid min-h-[55dvh] content-end gap-4 rounded-xl bg-surface-low p-4 sm:p-6">
+        {visible.length === 0 ? <p className="py-16 text-center type-body-lg text-on-surface-variant">The room is empty. Say something.</p> : null}
+        <AnimatePresence initial={false}>
+          {visible.map((m) => {
+            const created = Date.parse(m.created_at)
+            const expires = Date.parse(m.expires_at)
+            const mine = m.author_id === viewerId
+            return (
+              <motion.div
+                key={m.id}
+                layout
+                className="grid"
+                initial={{ opacity: 0, y: 16, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, transition: { duration: 0.6 } }}
+                transition={{ duration: 0.35, ease: ease.decelerate }}
+                style={{ transformOrigin: mine ? 'bottom right' : 'bottom left' }}
+              >
+                <MessageLine
+                  author={people[m.author_id]?.display_name ?? '…'}
+                  body={m.body}
+                  time={clock.format(created)}
+                  expiresIn={timeLeft(m.expires_at, now)}
+                  mine={mine}
+                  life={(expires - now) / (expires - created)}
+                />
+              </motion.div>
+            )
+          })}
+        </AnimatePresence>
         <div ref={bottom} />
       </div>
 
-      <form onSubmit={send} className="flex items-end gap-2">
+      <form onSubmit={send} className="flex items-end gap-2 rounded-xl bg-surface-high p-2 pl-5">
         <textarea
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
@@ -125,14 +140,19 @@ export function ChatRoom({
           maxLength={2000}
           placeholder="Write a message"
           aria-label="Message"
-          className="max-h-40 min-h-11 flex-1 resize-none rounded-[2px] border border-rule bg-surface px-3 py-2.5 text-[15px] outline-none [field-sizing:content] focus:border-ink"
+          className="max-h-40 min-h-10 flex-1 resize-none bg-transparent py-2.5 type-body-lg text-on-surface outline-none placeholder:text-on-surface-variant [field-sizing:content] focus-visible:outline-none"
         />
-        <Button type="submit" disabled={!draft.trim()}>
-          Send
-        </Button>
+        <button
+          type="submit"
+          disabled={!draft.trim()}
+          aria-label="Send"
+          className="state-layer grid size-12 shrink-0 place-items-center rounded-lg bg-primary text-on-primary transition-opacity disabled:opacity-[0.38]"
+        >
+          <Icon name="send" filled />
+        </button>
       </form>
       {error ? (
-        <p role="alert" className="text-[13px] text-danger">
+        <p role="alert" className="px-2 type-body-md text-error">
           {error}
         </p>
       ) : null}

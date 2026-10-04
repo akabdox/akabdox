@@ -5,7 +5,7 @@ import { TransactionBadge } from '@/components/status'
 import { Badge } from '@/components/ui/badge'
 import { ActionForm } from '@/components/ui/action-form'
 import { Field, Input } from '@/components/ui/field'
-import { Rule } from '@/components/ui/rule'
+import { Icon } from '@/components/ui/icon'
 import { SubmitButton } from '@/components/ui/submit-button'
 import { createClient } from '@/lib/supabase/server'
 import { requireAdmin } from '@/lib/viewer'
@@ -71,21 +71,24 @@ export default async function AdminPage() {
   ]
 
   return (
-    <div className="grid gap-12">
+    <div className="grid gap-6">
       <PageHeader eyebrow="Founder" title="Admin" />
 
-      <dl className="tabular grid grid-cols-2 gap-px border border-rule bg-rule sm:grid-cols-4">
-        {stats.map(([label, value]) => (
-          <div key={label} className="grid gap-2 bg-paper p-5">
-            <dt className="eyebrow">{label}</dt>
-            <dd className="text-[24px] font-medium">{value}</dd>
+      <dl className="tabular grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {stats.map(([label, value], i) => (
+          <div key={label} className={i === 0 ? 'grid gap-2 rounded-md bg-primary-container p-5 text-on-primary-container' : 'grid gap-2 rounded-md bg-surface-low p-5'}>
+            <dt className={i === 0 ? 'type-label-lg' : 'type-label-lg text-on-surface-variant'}>{label}</dt>
+            <dd className="type-headline-sm">{value}</dd>
           </div>
         ))}
       </dl>
 
-      <section className="grid gap-4">
-        <Rule label="Invite links" />
-        <p className="max-w-lg text-[14px] text-ink-2">
+      <section className="grid gap-5 rounded-xl bg-surface-low p-5 sm:p-8">
+        <h2 className="flex items-center gap-2 type-title-lg">
+          <Icon name="link" className="text-primary" />
+          Invite links
+        </h2>
+        <p className="-mt-2 max-w-lg type-body-md text-on-surface-variant">
           Only you can invite. Create a link, choose how many people it can seat and how long it stays open, then share it.
         </p>
         <ActionForm action={createInviteLink} className="max-w-md">
@@ -97,7 +100,7 @@ export default async function AdminPage() {
               <Input name="valid_days" type="number" min="1" max="365" defaultValue={14} required />
             </Field>
           </div>
-          <SubmitButton size="sm" className="justify-self-start" pendingLabel="Creating">
+          <SubmitButton icon="add" className="justify-self-start" pendingLabel="Creating">
             Create link
           </SubmitButton>
         </ActionForm>
@@ -105,10 +108,10 @@ export default async function AdminPage() {
           const url = `${siteUrl()}/join?code=${l.code}`
           const open = l.uses < l.max_uses && Date.parse(l.expires_at) > now
           return (
-            <div key={l.code} className="grid gap-3 border-b border-rule pb-4 sm:grid-cols-[1fr_auto] sm:items-center">
+            <div key={l.code} className="grid gap-3 rounded-md bg-surface-container p-4 sm:grid-cols-[1fr_auto] sm:items-center">
               <div className="grid min-w-0 gap-1">
-                <span className="truncate text-[14px] font-medium">{url}</span>
-                <span className="tabular text-[12px] text-ink-3">
+                <span className="truncate type-title-sm">{url}</span>
+                <span className="tabular type-body-sm text-on-surface-variant">
                   {l.uses} of {l.max_uses} seats used · {open ? `open until ${formatDate(l.expires_at)}` : `closed ${formatDate(l.expires_at)}`}
                 </span>
               </div>
@@ -132,9 +135,12 @@ export default async function AdminPage() {
         })}
       </section>
 
-      <section className="grid max-w-sm gap-4">
-        <Rule label="Commission" />
-        <ActionForm action={setCommission}>
+      <section className="grid gap-5 rounded-xl bg-surface-low p-5 sm:p-8">
+        <h2 className="flex items-center gap-2 type-title-lg">
+          <Icon name="payments" className="text-primary" />
+          Commission
+        </h2>
+        <ActionForm action={setCommission} className="max-w-sm">
           <Field label="Platform rate (%)" hint="Snapshotted per order. Changing it never rewrites past sales.">
             <Input name="percent" type="number" step="0.25" min="0" max="20" defaultValue={s.commission_bps / 100} />
           </Field>
@@ -144,14 +150,17 @@ export default async function AdminPage() {
         </ActionForm>
       </section>
 
-      <section className="grid gap-2">
-        <Rule label="Ledger" />
-        <div className="overflow-x-auto">
-          <table className="tabular w-full min-w-[760px] text-left text-[13px]">
+      <section className="grid gap-4 rounded-xl bg-surface-low p-5 sm:p-8">
+        <h2 className="flex items-center gap-2 type-title-lg">
+          <Icon name="receipt_long" className="text-primary" />
+          Ledger
+        </h2>
+        <div className="-mx-5 overflow-x-auto px-5 sm:-mx-8 sm:px-8">
+          <table className="tabular w-full min-w-[820px] text-left type-body-md">
             <thead>
-              <tr className="border-b border-rule">
+              <tr className="border-b border-outline-variant">
                 {['Date', 'Book', 'Buyer → Seller', 'Amount', 'Commission', 'Seller net', 'Status', ''].map((h) => (
-                  <th key={h} className="eyebrow py-3 pr-4 font-medium">
+                  <th key={h} className="py-3 pr-4 type-label-lg text-on-surface-variant">
                     {h}
                   </th>
                 ))}
@@ -159,9 +168,9 @@ export default async function AdminPage() {
             </thead>
             <tbody>
               {txs.map((t) => (
-                <tr key={t.id} className="border-b border-rule align-top">
-                  <td className="py-3 pr-4 text-ink-3">{formatDate(t.created_at)}</td>
-                  <td className="py-3 pr-4 font-medium">{t.listing.book.title}</td>
+                <tr key={t.id} className="border-b border-outline-variant align-top">
+                  <td className="py-3 pr-4 text-on-surface-variant">{formatDate(t.created_at)}</td>
+                  <td className="py-3 pr-4 type-title-sm">{t.listing.book.title}</td>
                   <td className="py-3 pr-4">
                     @{t.buyer.username} → @{t.seller.username}
                   </td>
@@ -172,7 +181,7 @@ export default async function AdminPage() {
                     <div className="grid justify-items-start gap-1">
                       <TransactionBadge status={t.status} />
                       {t.status === 'paid' ? (
-                        <span className="text-[11px] text-ink-3">{t.paid_out_at ? 'Paid out' : 'Payout owed'}</span>
+                        <span className="type-label-sm text-on-surface-variant">{t.paid_out_at ? 'Paid out' : 'Payout owed'}</span>
                       ) : null}
                     </div>
                   </td>
@@ -192,7 +201,7 @@ export default async function AdminPage() {
               ))}
             </tbody>
           </table>
-          {txs.length === 0 ? <p className="py-10 text-center text-ink-3">No transactions yet.</p> : null}
+          {txs.length === 0 ? <p className="py-10 text-center type-body-lg text-on-surface-variant">No transactions yet.</p> : null}
         </div>
       </section>
     </div>

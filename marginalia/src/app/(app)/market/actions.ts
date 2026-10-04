@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { chargilyEnabled, createCheckout } from '@/lib/payments/chargily'
 import { field, friendlyError, type ActionState } from '@/lib/form'
-import { siteUrl } from '@/lib/site'
+import { site, siteUrl } from '@/lib/site'
 
 export async function buy(_: ActionState, form: FormData): Promise<ActionState> {
   const supabase = await createClient()
@@ -26,7 +26,7 @@ export async function buy(_: ActionState, form: FormData): Promise<ActionState> 
       successUrl: `${origin}/orders?placed=${order.id}`,
       failureUrl: `${origin}/orders`,
       webhookUrl: `${origin}/api/payments/chargily`,
-      description: `Marginalia order ${order.id.slice(0, 8)}`,
+      description: `${site.name} order ${order.id.slice(0, 8)}`,
     })
     const { error: saveError } = await admin
       .from('transactions')

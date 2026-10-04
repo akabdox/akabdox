@@ -9,6 +9,7 @@ export function CopyButton({ text, label = 'Copy link' }: { text: string; label?
     <Button
       size="sm"
       variant="secondary"
+      icon={copied ? 'check' : 'content_copy'}
       onClick={async () => {
         await navigator.clipboard.writeText(text)
         setCopied(true)

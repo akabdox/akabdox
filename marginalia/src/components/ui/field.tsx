@@ -21,7 +21,7 @@ export function Field({
     <label className={cn('grid gap-1.5', className)}>
       <span className="type-label-lg text-on-surface-variant">{label}</span>
       {children}
-      {hint ? <span className="px-4 type-body-sm text-on-surface-variant">{hint}</span> : null}
+      {hint ? <span className="type-body-sm text-on-surface-variant">{hint}</span> : null}
     </label>
   )
 }
@@ -62,15 +62,15 @@ export function Segmented({
   defaultValue: string
 }) {
   return (
-    <div className="inline-flex h-10 overflow-hidden rounded-full border border-outline" role="radiogroup">
+    <div className="inline-flex h-10 w-fit max-w-full overflow-hidden rounded-full border border-outline" role="radiogroup">
       {options.map((o) => (
         <label
           key={o.value}
           className="state-layer flex cursor-pointer items-center gap-2 border-l border-outline px-4 type-label-lg text-on-surface first:border-l-0 has-[:checked]:bg-secondary-container has-[:checked]:text-on-secondary-container has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2 has-[:focus-visible]:outline-secondary sm:px-5"
         >
           <input type="radio" name={name} value={o.value} defaultChecked={o.value === defaultValue} className="peer sr-only" />
-          <span aria-hidden className="material-symbols-rounded hidden text-[18px] peer-checked:inline-block">
-            check
+          <span aria-hidden className="hidden peer-checked:inline-grid">
+            <span className="material-symbols-rounded text-[18px]">check</span>
           </span>
           {o.label}
         </label>

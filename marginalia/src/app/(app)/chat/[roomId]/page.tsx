@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { BackLink } from '@/components/back-link'
 import { ChatRoom } from '@/components/chat-room'
+import { Icon } from '@/components/ui/icon'
 import { createClient } from '@/lib/supabase/server'
 import { requireViewer } from '@/lib/viewer'
 import { describeInterval } from '@/lib/time'
@@ -41,13 +42,14 @@ export default async function RoomPage({ params }: { params: Promise<{ roomId: s
   const title = r.kind === 'public' ? r.name : (other?.display_name ?? 'Conversation')
 
   return (
-    <div className="mx-auto grid max-w-2xl gap-6">
+    <div className="mx-auto grid max-w-3xl gap-4">
       <header className="grid gap-2">
-        <Link href="/chat" className="eyebrow hover:text-ink">
-          ← Chat
-        </Link>
-        <h1 className="text-[30px]">{title}</h1>
-        <p className="text-[13px] text-ink-3">Messages disappear {describeInterval(r.message_ttl)} after they are sent.</p>
+        <BackLink href="/chat">Chat</BackLink>
+        <h1 className="type-headline-lg">{title}</h1>
+        <p className="inline-flex items-center gap-2 type-body-md text-on-surface-variant">
+          <Icon name="timer" size={18} />
+          Messages disappear {describeInterval(r.message_ttl)} after they are sent.
+        </p>
       </header>
       <ChatRoom
         roomId={r.id}

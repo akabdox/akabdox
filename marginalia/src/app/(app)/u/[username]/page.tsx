@@ -5,7 +5,8 @@ import { ShelfCard } from '@/components/shelf-card'
 import { SellForm } from '@/components/sell-form'
 import { ActionForm } from '@/components/ui/action-form'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Button, ButtonLink } from '@/components/ui/button'
+import { Icon } from '@/components/ui/icon'
 import { Empty } from '@/components/ui/empty'
 import { Checkbox, Field, Input, Select } from '@/components/ui/field'
 import { Monogram } from '@/components/ui/monogram'
@@ -79,34 +80,34 @@ export default async function ProfilePage({
 
   return (
     <div className="grid gap-10">
-      <header className="grid gap-6 sm:grid-cols-[auto_1fr_auto] sm:items-center">
+      <header className="animate-rise grid gap-5 rounded-xl bg-surface-low p-5 sm:grid-cols-[auto_1fr_auto] sm:items-center sm:gap-6 sm:p-8">
         <Monogram name={profile.display_name} size="lg" />
-        <div className="grid gap-1">
-          <h1 className="flex flex-wrap items-center gap-3 text-[32px]">
+        <div className="grid gap-1.5">
+          <h1 className="flex flex-wrap items-center gap-3 type-headline-lg">
             {profile.display_name}
             {profile.role === 'admin' ? <Badge tone="outline">Founder</Badge> : null}
           </h1>
-          <p className="text-[14px] text-ink-3">
+          <p className="type-body-md text-on-surface-variant">
             @{profile.username}
             {profile.city ? ` · ${profile.city}` : ''} · member since {formatDate(profile.created_at)}
           </p>
-          {profile.bio ? <p className="mt-2 max-w-lg text-ink-2">{profile.bio}</p> : null}
+          {profile.bio ? <p className="mt-1 max-w-lg type-body-lg text-on-surface">{profile.bio}</p> : null}
         </div>
         {own ? (
-          <Link href="/settings" className="eyebrow hover:text-ink">
+          <ButtonLink href="/settings" variant="tonal" icon="edit" className="justify-self-start">
             Edit profile
-          </Link>
+          </ButtonLink>
         ) : (
           <form action={openDirect}>
             <input type="hidden" name="user_id" value={profile.id} />
-            <Button type="submit" variant="secondary">
+            <Button type="submit" icon="chat">
               Message
             </Button>
           </form>
         )}
       </header>
 
-      <dl className="tabular grid grid-cols-4 border-y border-rule py-5 text-center">
+      <dl className="tabular grid grid-cols-2 gap-3 sm:grid-cols-4">
         {(
           [
             ['Books', counts.books],
@@ -115,22 +116,27 @@ export default async function ProfilePage({
             ['For sale', counts.sale],
           ] as const
         ).map(([label, n]) => (
-          <div key={label} className="grid gap-1">
-            <dd className="text-[26px] font-medium">{n}</dd>
-            <dt className="eyebrow">{label}</dt>
+          <div key={label} className="grid gap-1 rounded-md bg-surface-container px-5 py-4">
+            <dd className="type-headline-md text-primary">{n}</dd>
+            <dt className="type-label-lg text-on-surface-variant">{label}</dt>
           </div>
         ))}
       </dl>
 
-      <div className="grid gap-10 lg:grid-cols-[1fr_320px]">
+      <div className="grid items-start gap-8 lg:grid-cols-[1fr_340px]">
         <section>
-          <nav className="flex flex-wrap gap-5 border-b border-rule pb-3" aria-label="Filter shelf">
+          <nav className="flex flex-wrap gap-2" aria-label="Filter shelf">
             {filters.map((f) => (
               <Link
                 key={f.key}
                 href={f.key === 'all' ? `/u/${profile.username}` : `/u/${profile.username}?show=${f.key}`}
-                className={cn('eyebrow hover:text-ink', filter === f.key && 'text-ink underline underline-offset-8')}
+                aria-current={filter === f.key ? 'true' : undefined}
+                className={cn(
+                  'state-layer inline-flex h-8 items-center gap-2 rounded-sm border px-4 type-label-lg',
+                  filter === f.key ? 'border-transparent bg-secondary-container pl-2 text-on-secondary-container' : 'border-outline text-on-surface-variant',
+                )}
               >
+                {filter === f.key ? <Icon name="check" size={18} /> : null}
                 {f.label}
               </Link>
             ))}
@@ -143,17 +149,20 @@ export default async function ProfilePage({
               </Empty>
             </div>
           ) : (
-            visible.map((item) => {
+            <div className="mt-6 grid gap-3">
+            {visible.map((item) => {
               const listing = isOpen(item)
               return (
                 <ShelfCard key={item.id} item={item}>
                   {own ? (
                     <details className="group mt-1">
-                      <summary className="eyebrow cursor-pointer list-none hover:text-ink">
+                      <summary className="state-layer -ml-3 inline-flex cursor-pointer list-none items-center gap-2 rounded-full px-3 py-2 type-label-lg text-primary [&::-webkit-details-marker]:hidden">
+                        <Icon name="edit" size={18} className="group-open:hidden" />
+                        <Icon name="close" size={18} className="hidden group-open:inline-block" />
                         <span className="group-open:hidden">Manage</span>
                         <span className="hidden group-open:inline">Close</span>
                       </summary>
-                      <div className="mt-4 grid gap-6 border-l border-rule pl-4">
+                      <div className="mt-3 grid gap-6 rounded-md bg-surface-container p-4 sm:p-5">
                         <ActionForm action={updateShelfItem}>
                           <input type="hidden" name="id" value={item.id} />
                           <div className="grid gap-4 sm:grid-cols-2">
@@ -192,7 +201,7 @@ export default async function ProfilePage({
                               </SubmitButton>
                             </ActionForm>
                           ) : (
-                            <p className="text-[13px] text-ink-3">A buyer is checking out. The copy is reserved.</p>
+                            <p className="type-body-md text-on-surface-variant">A buyer is checking out. The copy is reserved.</p>
                           )
                         ) : (
                           <SellForm shelfItemId={item.id} bps={settings.commission_bps} currency={settings.currency} action={listForSale} />
@@ -201,7 +210,7 @@ export default async function ProfilePage({
                         {!listing || listing.status === 'active' ? (
                           <ActionForm action={removeShelfItem}>
                             <input type="hidden" name="id" value={item.id} />
-                            <SubmitButton size="sm" variant="ghost" className="justify-self-start text-danger">
+                            <SubmitButton size="sm" variant="ghost" icon="delete" className="justify-self-start text-error">
                               Remove from shelf
                             </SubmitButton>
                           </ActionForm>
@@ -211,13 +220,17 @@ export default async function ProfilePage({
                   ) : null}
                 </ShelfCard>
               )
-            })
+            })}
+            </div>
           )}
         </section>
 
         {own ? (
-          <aside className="h-fit border border-rule bg-surface p-5 lg:sticky lg:top-24">
-            <p className="eyebrow mb-4">Add a book</p>
+          <aside id="add" className="h-fit scroll-mt-24 rounded-xl bg-surface-low p-5 sm:p-6 lg:sticky lg:top-24">
+            <h2 className="mb-5 flex items-center gap-2 type-title-lg">
+              <Icon name="add" className="text-primary" />
+              Add a book
+            </h2>
             <ActionForm action={addBook}>
               <Field label="Title">
                 <Input name="title" required maxLength={300} />
@@ -258,12 +271,13 @@ export default async function ProfilePage({
                 </Select>
               </Field>
               <Checkbox name="open_to_swap" label="Open to swap" />
-              <SubmitButton pendingLabel="Adding">Add to shelf</SubmitButton>
+              <SubmitButton pendingLabel="Adding" icon="add" className="mt-1">
+                Add to shelf
+              </SubmitButton>
             </ActionForm>
           </aside>
         ) : null}
       </div>
-
     </div>
   )
 }
